@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>استعلام نوبت</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+    margin:0;
+    background:#f5f6f8;
+    font-family:Tahoma,Arial,sans-serif;
+    color:#222;
+}
+.container{
+    width:95%;
+    max-width:850px;
+    margin:35px auto;
+}
+.header{
+    background:#fff;
+    border-radius:12px;
+    padding:22px;
+    text-align:center;
+    box-shadow:0 2px 10px #00000012;
+    margin-bottom:18px;
+}
+.header h1{
+    margin:0 0 8px;
+    font-size:25px;
+}
+.header p{
+    margin:0;
+    color:#777;
+}
+.search{
+    background:#fff;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 10px #00000012;
+}
+.search input{
+    width:100%;
+    padding:15px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    font-size:16px;
+    text-align:center;
+    outline:none;
+}
+.search button{
+    width:100%;
+    margin-top:12px;
+    padding:14px;
+    border:0;
+    border-radius:8px;
+    background:#1769aa;
+    color:white;
+    font-size:17px;
+    cursor:pointer;
+}
+.search button:active{opacity:.8}
+
+#message{
+    text-align:center;
+    padding:18px;
+    display:none;
+}
+
+.result{
+    display:none;
+    margin-top:18px;
+    background:#fff;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 2px 10px #00000012;
+}
+.result-title{
+    background:#1769aa;
+    color:#fff;
+    padding:17px;
+    text-align:center;
+    font-size:19px;
+    font-weight:bold;
+}
+.row{
+    display:flex;
+    border-bottom:1px solid #eee;
+    min-height:52px;
+}
+.label{
+    width:42%;
+    background:#f8f8f8;
+    padding:14px;
+    font-weight:bold;
+}
+.value{
+    width:58%;
+    padding:14px;
+    word-break:break-word;
+}
+.status{
+    text-align:center;
+    padding:18px;
+    font-weight:bold;
+}
+.footer{
+    text-align:center;
+    color:#888;
+    font-size:13px;
+    margin:20px 0;
+}
+@media(max-width:550px){
+    .container{margin:15px auto}
+    .row{display:block}
+    .label,.value{width:100%}
+    .label{padding-bottom:8px}
+    .value{padding-top:8px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+    <h1>استعلام نوبت</h1>
+    <p>برای مشاهده اطلاعات نوبت، سریال نوبت را وارد کنید</p>
+</div>
+
+<div class="search">
+    <input id="serial" type="text"
+           placeholder="سریال نوبت را وارد کنید"
+           autocomplete="off">
+    <button onclick="searchAppointment()">استعلام نوبت</button>
+</div>
+
+<div id="message"></div>
+
+<div id="result" class="result">
+
+    <div class="result-title">اطلاعات نوبت</div>
+
+    <div class="row">
+        <div class="label">سریال نوبت</div>
+        <div class="value" id="r_serial"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">نام مرز</div>
+        <div class="value" id="r_border_name"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">نوع صف</div>
+        <div class="value" id="r_queue_type"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">شماره پلاک</div>
+        <div class="value" id="r_plate_number"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">نوع نوبت</div>
+        <div class="value" id="r_appointment_type"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">زمان دریافت نوبت</div>
+        <div class="value" id="r_received_at"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">وضعیت</div>
+        <div class="value" id="r_status"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">تیرپارک</div>
+        <div class="value" id="r_terminal"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">شماره سرویس</div>
+        <div class="value" id="r_service_number"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">زمان ورود به تیرپارک</div>
+        <div class="value" id="r_entered_terminal_at"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">زمان فراخوان</div>
+        <div class="value" id="r_called_at"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">زمان خروج از تیرپارک</div>
+        <div class="value" id="r_exited_terminal_at"></div>
+    </div>
+
+    <div class="row">
+        <div class="label">زمان مجاز ورود به گمرک</div>
+        <div class="value" id="r_allowed_customs_at"></div>
+    </div>
+
+    <div class="status" id="r_status_bottom"></div>
+
+</div>
+
+<div class="footer">
+    سامانه استعلام نوبت
+</div>
+
+</div>
+
+<script>
+
+/* =====================================================
+   تنظیمات Supabase
+   بعداً این دو مقدار را از پروژه Supabase خودت می‌گیریم
+   ===================================================== */
+
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
+
+
+/* =====================================================
+   استعلام نوبت
+   ===================================================== */
+
+async function searchAppointment(){
+
+    const serial = document.getElementById("serial")
+        .value.trim();
+
+    const message = document.getElementById("message");
+    const result = document.getElementById("result");
+
+    result.style.display = "none";
+
+    if(!serial){
+        message.style.display = "block";
+        message.innerHTML = "لطفاً سریال نوبت را وارد کنید.";
+        return;
+    }
+
+    message.style.display = "block";
+    message.innerHTML = "در حال دریافت اطلاعات...";
+
+    const {data,error} = await supabaseClient
+        .from("appointments")
+        .select("*")
+        .eq("serial",serial)
+        .maybeSingle();
+
+    if(error){
+
+        console.error(error);
+
+        message.innerHTML =
+            "خطا در اتصال به سامانه. تنظیمات Supabase را بررسی کنید.";
+
+        return;
+    }
+
+    if(!data){
+
+        message.innerHTML =
+            "نوبتی با این سریال پیدا نشد.";
+
+        return;
+    }
+
+    message.style.display = "none";
+
+    document.getElementById("r_serial").textContent =
+        data.serial || "-";
+
+    document.getElementById("r_border_name").textContent =
+        data.border_name || "-";
+
+    document.getElementById("r_queue_type").textContent =
+        data.queue_type || "-";
+
+    document.getElementById("r_plate_number").textContent =
+        data.plate_number || "-";
+
+    document.getElementById("r_appointment_type").textContent =
+        data.appointment_type || "-";
+
+    document.getElementById("r_received_at").textContent =
+        data.received_at || "-";
+
+    document.getElementById("r_status").textContent =
+        data.status || "-";
+
+    document.getElementById("r_terminal").textContent =
+        data.terminal || "-";
+
+    document.getElementById("r_service_number").textContent =
+        data.service_number || "-";
+
+    document.getElementById("r_entered_terminal_at").textContent =
+        data.entered_terminal_at || "-";
+
+    document.getElementById("r_called_at").textContent =
+        data.called_at || "-";
+
+    document.getElementById("r_exited_terminal_at").textContent =
+        data.exited_terminal_at || "-";
+
+    document.getElementById("r_allowed_customs_at").textContent =
+        data.allowed_customs_at || "-";
+
+    document.getElementById("r_status_bottom").textContent =
+        data.status || "";
+
+    result.style.display = "block";
+
+}
+
+
+/* =====================================================
+   اگر لینک QR شامل سریال باشد، خودکار استعلام می‌کند
+   مثال:
+   index.html?serial=FN050501269
+   ===================================================== */
+
+window.addEventListener("load",function(){
+
+    const params = new URLSearchParams(
+        window.location.search
+    );
+
+    const serial = params.get("serial");
+
+    if(serial){
+
+        document.getElementById("serial").value = serial;
+
+        searchAppointment();
+
+    }
+
+});
+
+
+/* جستجو با دکمه Enter */
+
+document.getElementById("serial")
+.addEventListener("keydown",function(e){
+
+    if(e.key === "Enter"){
+        searchAppointment();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
