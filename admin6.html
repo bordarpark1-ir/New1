@@ -73,6 +73,11 @@ button:active{
   transform:scale(.98);
 }
 
+button:disabled{
+  opacity:.65;
+  cursor:not-allowed;
+}
+
 .primary{
   background:#1683d8;
   color:white;
@@ -296,6 +301,7 @@ th{
   >
 
   <button
+    id="loginButton"
     class="primary"
     style="width:100%"
     onclick="login()"
@@ -560,12 +566,11 @@ th{
 
 <script>
 
-const supabaseClient =
-  window.supabase.createClient(
-    window.SUPABASE_URL,
-    window.SUPABASE_ANON_KEY
-  );
+/* =====================================================
+   بررسی اولیه
+===================================================== */
 
+let supabaseClient = null;
 
 let rows = [];
 
@@ -575,6 +580,330 @@ let currentQRId = "";
 
 let currentQRUrl = "";
 
+
+/* =====================================================
+   اتصال به Supabase
+===================================================== */
+
+function initializeSupabase(){
+
+  try{
+
+    if(!window.supabase){
+
+      showLoginError(
+        "کتابخانه Supabase بارگذاری نشده است. اینترنت را بررسی کنید."
+      );
+
+      return false;
+    }
+
+
+    if(
+      !window.SUPABASE_URL ||
+      !window.SUPABASE_ANON_KEY
+    ){
+
+      showLoginError(
+        "اطلاعات اتصال Supabase در config.js پیدا نشد."
+      );
+
+      return false;
+    }
+
+
+    supabaseClient =
+      window.supabase.createClient(
+        window.SUPABASE_URL,
+        window.SUPABASE_ANON_KEY
+      );
+
+
+    return true;
+
+  }catch(error){
+
+    showLoginError(
+      "خطا در اتصال به Supabase: " +
+      error.message
+    );
+
+    return false;
+  }
+
+}
+
+
+/* =====================================================
+   پیام خطای ورود
+===================================================== */
+
+function showLoginError(text){
+
+  const msg =
+    document.getElementById("loginMsg");
+
+  msg.textContent = text;
+
+  msg.className =
+    "message err";
+
+  msg.style.display = "block";
+
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+async function login(){
+
+  const email =
+    document
+      .getElementById("email")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("password")
+      .value;
+
+  const msg =
+    document.getElementById("loginMsg");
+
+  const button =
+    document.getElementById("loginButton");
+
+
+  msg.style.display = "none";
+
+
+  if(!email || !password){
+
+    showLoginError(
+      "ایمیل و رمز عبور را وارد کنید."
+    );
+
+    return;
+  }
+
+
+  if(!supabaseClient){
+
+    const ready =
+      initializeSupabase();
+
+    if(!ready){
+
+      return;
+    }
+
+  }
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "در حال ورود...";
+
+
+  try{
+
+    const result =
+      await supabaseClient.auth.signInWithPassword({
+
+        email:email,
+        password:password
+
+      });
+
+
+    if(result.error){
+
+      showLoginError(
+        "ورود ناموفق بود: " +
+        result.error.message
+      );
+
+      return;
+    }
+
+
+    if(
+      !result.data ||
+      !result.data.user
+    ){
+
+      showLoginError(
+        "ورود انجام نشد. اطلاعات حساب مدیر را بررسی کنید."
+      );
+
+      return;
+    }
+
+
+    await showApp(
+      result.data.user
+    );
+
+
+  }catch(error){
+
+    showLoginError(
+      "خطای غیرمنتظره هنگام ورود: " +
+      error.message
+    );
+
+  }finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      "ورود به پنل";
+
+  }
+
+}
+
+
+/* =====================================================
+   SESSION
+===================================================== */
+
+async function checkSession(){
+
+  if(!supabaseClient){
+
+    return;
+  }
+
+
+  try{
+
+    const result =
+      await supabaseClient.auth.getSession();
+
+
+    if(
+      result.data &&
+      result.data.session
+    ){
+
+      await showApp(
+        result.data.session.user
+      );
+
+    }
+
+  }catch(error){
+
+    showLoginError(
+      "خطا در بررسی ورود: " +
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   SHOW APP
+===================================================== */
+
+async function showApp(user){
+
+  document
+    .getElementById("loginBox")
+    .classList
+    .add("hidden");
+
+
+  document
+    .getElementById("app")
+    .classList
+    .remove("hidden");
+
+
+  document
+    .getElementById("userInfo")
+    .textContent =
+      "مدیر وارد شده: " +
+      (user.email || "");
+
+
+  await loadAppointments();
+
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+async function logout(){
+
+  try{
+
+    if(supabaseClient){
+
+      await supabaseClient.auth.signOut();
+
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+  }
+
+  location.reload();
+
+}
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+function showMessage(text,type="ok"){
+
+  const box =
+    document.getElementById("mainMsg");
+
+
+  box.className =
+    "message " +
+    (
+      type === "ok"
+        ? "ok"
+        : "err"
+    );
+
+
+  box.textContent =
+    text;
+
+
+  box.style.display =
+    "block";
+
+
+  setTimeout(function(){
+
+    box.style.display =
+      "none";
+
+  },4000);
+
+}
+
+
+/* =====================================================
+   FIELDS
+===================================================== */
 
 const fields = [
 
@@ -595,138 +924,14 @@ const fields = [
 ];
 
 
-/* LOGIN */
-
-async function login(){
-
-  const email =
-    document.getElementById("email").value.trim();
-
-  const password =
-    document.getElementById("password").value;
-
-  const msg =
-    document.getElementById("loginMsg");
-
-  msg.style.display = "none";
-
-
-  if(!email || !password){
-
-    msg.textContent =
-      "ایمیل و رمز عبور را وارد کنید.";
-
-    msg.style.display = "block";
-
-    return;
-  }
-
-
-  const {data,error} =
-    await supabaseClient.auth.signInWithPassword({
-
-      email:email,
-      password:password
-
-    });
-
-
-  if(error){
-
-    msg.textContent =
-      "ورود ناموفق بود: " +
-      error.message;
-
-    msg.style.display = "block";
-
-    return;
-  }
-
-
-  showApp(data.user);
-
-}
-
-
-/* SESSION */
-
-async function checkSession(){
-
-  const {data} =
-    await supabaseClient.auth.getSession();
-
-  if(data && data.session){
-
-    showApp(data.session.user);
-
-  }
-
-}
-
-
-/* SHOW APP */
-
-async function showApp(user){
-
-  document
-    .getElementById("loginBox")
-    .classList.add("hidden");
-
-  document
-    .getElementById("app")
-    .classList.remove("hidden");
-
-  document
-    .getElementById("userInfo")
-    .textContent =
-      "مدیر وارد شده: " +
-      (user.email || "");
-
-  await loadAppointments();
-
-}
-
-
-/* LOGOUT */
-
-async function logout(){
-
-  await supabaseClient.auth.signOut();
-
-  location.reload();
-
-}
-
-
-/* MESSAGE */
-
-function showMessage(text,type="ok"){
-
-  const box =
-    document.getElementById("mainMsg");
-
-  box.className =
-    "message " +
-    (type === "ok" ? "ok" : "err");
-
-  box.textContent = text;
-
-  box.style.display = "block";
-
-  setTimeout(function(){
-
-    box.style.display = "none";
-
-  },4000);
-
-}
-
-
-/* FORM */
+/* =====================================================
+   FORM
+===================================================== */
 
 function getFormObject(){
 
   const obj = {};
+
 
   fields.forEach(function(id){
 
@@ -738,20 +943,35 @@ function getFormObject(){
 
   });
 
+
   return obj;
 
 }
 
 
-/* SAVE */
+/* =====================================================
+   SAVE
+===================================================== */
 
 async function saveAppointment(){
+
+  if(!supabaseClient){
+
+    showMessage(
+      "اتصال به Supabase برقرار نیست.",
+      "err"
+    );
+
+    return;
+  }
+
 
   const id =
     document
       .getElementById("editId")
       .value
       .trim();
+
 
   const obj =
     getFormObject();
@@ -771,59 +991,75 @@ async function saveAppointment(){
   let result;
 
 
-  if(id){
+  try{
 
-    result =
-      await supabaseClient
-        .from("appointments")
-        .update(obj)
-        .eq("id",id);
+    if(id){
 
-  }else{
+      result =
+        await supabaseClient
+          .from("appointments")
+          .update(obj)
+          .eq("id",id);
 
-    result =
-      await supabaseClient
-        .from("appointments")
-        .insert(obj)
-        .select()
-        .single();
+    }else{
 
-  }
+      result =
+        await supabaseClient
+          .from("appointments")
+          .insert(obj)
+          .select()
+          .single();
+
+    }
 
 
-  if(result.error){
+    if(result.error){
+
+      showMessage(
+        "خطا: " +
+        result.error.message,
+        "err"
+      );
+
+      return;
+    }
+
 
     showMessage(
-      "خطا: " +
-      result.error.message,
+      id
+        ? "نوبت با موفقیت ویرایش شد."
+        : "نوبت با موفقیت ثبت شد."
+    );
+
+
+    clearForm();
+
+    await loadAppointments();
+
+
+  }catch(error){
+
+    showMessage(
+      "خطای غیرمنتظره: " +
+      error.message,
       "err"
     );
 
-    return;
   }
-
-
-  showMessage(
-    id
-      ? "نوبت با موفقیت ویرایش شد."
-      : "نوبت با موفقیت ثبت شد."
-  );
-
-
-  clearForm();
-
-  await loadAppointments();
 
 }
 
 
-/* CLEAR */
+/* =====================================================
+   CLEAR
+===================================================== */
 
 function clearForm(){
 
   document
     .getElementById("editId")
     .value = "";
+
 
   fields.forEach(function(id){
 
@@ -833,6 +1069,7 @@ function clearForm(){
 
   });
 
+
   document
     .getElementById("formTitle")
     .textContent =
@@ -841,38 +1078,63 @@ function clearForm(){
 }
 
 
-/* LOAD */
+/* =====================================================
+   LOAD
+===================================================== */
 
 async function loadAppointments(){
 
-  const {data,error} =
-    await supabaseClient
-      .from("appointments")
-      .select("*")
-      .order("id",{ascending:false})
-      .limit(500);
-
-
-  if(error){
-
-    showMessage(
-      "خطا در دریافت نوبت‌ها: " +
-      error.message,
-      "err"
-    );
+  if(!supabaseClient){
 
     return;
   }
 
 
-  rows = data || [];
+  try{
 
-  filterRows();
+    const result =
+      await supabaseClient
+        .from("appointments")
+        .select("*")
+        .order("id",{ascending:false})
+        .limit(500);
+
+
+    if(result.error){
+
+      showMessage(
+        "خطا در دریافت نوبت‌ها: " +
+        result.error.message,
+        "err"
+      );
+
+      return;
+    }
+
+
+    rows =
+      result.data || [];
+
+
+    filterRows();
+
+
+  }catch(error){
+
+    showMessage(
+      "خطا در دریافت اطلاعات: " +
+      error.message,
+      "err"
+    );
+
+  }
 
 }
 
 
-/* FILTER */
+/* =====================================================
+   FILTER
+===================================================== */
 
 function filterRows(){
 
@@ -892,6 +1154,7 @@ function filterRows(){
         " " +
         String(r.plate_number || "");
 
+
       return text
         .toLowerCase()
         .includes(q);
@@ -904,7 +1167,9 @@ function filterRows(){
 }
 
 
-/* RENDER */
+/* =====================================================
+   RENDER
+===================================================== */
 
 function render(list){
 
@@ -953,9 +1218,13 @@ function render(list){
           </td>
 
           <td>
+
             <span class="badge">
+
               ${esc(r.status)}
+
             </span>
+
           </td>
 
           <td>
@@ -1012,26 +1281,595 @@ function render(list){
 }
 
 
-/* QR */
+/* =====================================================
+   QR BY INDEX
+===================================================== */
 
 function makeQRByIndex(index){
 
-  const row = rows[index];
+  const row =
+    rows[index];
+
 
   if(!row){
 
-    alert("نوبت پیدا نشد.");
+    alert(
+      "نوبت پیدا نشد."
+    );
 
     return;
   }
+
 
   makeQR(row);
 
 }
 
 
-/* EDIT */
+/* =====================================================
+   EDIT BY INDEX
+===================================================== */
 
 function editByIndex(index){
 
-  const row = rows
+  const row =
+    rows[index];
+
+
+  if(!row){
+
+    alert(
+      "نوبت پیدا نشد."
+    );
+
+    return;
+  }
+
+
+  editRow(row);
+
+}
+
+
+/* =====================================================
+   DELETE BY INDEX
+===================================================== */
+
+function deleteByIndex(index){
+
+  const row =
+    rows[index];
+
+
+  if(!row){
+
+    alert(
+      "نوبت پیدا نشد."
+    );
+
+    return;
+  }
+
+
+  deleteRow(row.id);
+
+}
+
+
+/* =====================================================
+   EDIT ROW
+===================================================== */
+
+function editRow(row){
+
+  document
+    .getElementById("editId")
+    .value =
+      row.id || "";
+
+
+  fields.forEach(function(id){
+
+    document
+      .getElementById(id)
+      .value =
+        row[id] || "";
+
+  });
+
+
+  document
+    .getElementById("formTitle")
+    .textContent =
+      "ویرایش نوبت";
+
+
+  window.scrollTo({
+
+    top:0,
+
+    behavior:"smooth"
+
+  });
+
+}
+
+
+/* =====================================================
+   DELETE
+===================================================== */
+
+async function deleteRow(id){
+
+  if(!confirm(
+    "آیا از حذف این نوبت مطمئن هستید؟"
+  )){
+
+    return;
+  }
+
+
+  try{
+
+    const result =
+      await supabaseClient
+        .from("appointments")
+        .delete()
+        .eq("id",id);
+
+
+    if(result.error){
+
+      showMessage(
+        "خطا در حذف: " +
+        result.error.message,
+        "err"
+      );
+
+      return;
+    }
+
+
+    showMessage(
+      "نوبت با موفقیت حذف شد."
+    );
+
+
+    await loadAppointments();
+
+
+  }catch(error){
+
+    showMessage(
+      "خطا در حذف: " +
+      error.message,
+      "err"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   ESCAPE
+===================================================== */
+
+function esc(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* =====================================================
+   QR اختصاصی
+===================================================== */
+
+function makeQR(row){
+
+  const serial =
+    String(row.serial || "").trim();
+
+
+  const id =
+    String(row.id || "").trim();
+
+
+  if(!serial){
+
+    alert(
+      "این نوبت شماره سریال ندارد."
+    );
+
+    return;
+  }
+
+
+  if(!id){
+
+    alert(
+      "شناسه یکتای این نوبت موجود نیست."
+    );
+
+    return;
+  }
+
+
+  /*
+   * مقصد QR سایت خودمان است.
+   *
+   * هر QR فقط ID اختصاصی همان نوبت
+   * را داخل آدرس قرار می‌دهد.
+   */
+
+  const url =
+    "https://bordarpark1-ir.github.io/New1/" +
+    "?id=" +
+    encodeURIComponent(id);
+
+
+  currentQRSerial =
+    serial;
+
+
+  currentQRId =
+    id;
+
+
+  currentQRUrl =
+    url;
+
+
+  const modal =
+    document.getElementById("qrModal");
+
+
+  modal.classList.remove("hidden");
+
+
+  const qrBox =
+    document.getElementById("qrcode");
+
+
+  qrBox.innerHTML =
+    "";
+
+
+  document
+    .getElementById("qrSerial")
+    .textContent =
+      "شماره نوبت: " +
+      serial;
+
+
+  document
+    .getElementById("qrId")
+    .textContent =
+      "شناسه اختصاصی: " +
+      id;
+
+
+  document
+    .getElementById("qrUrl")
+    .textContent =
+      url;
+
+
+  try{
+
+    new QRCode(
+
+      qrBox,
+
+      {
+
+        text:url,
+
+        width:240,
+
+        height:240,
+
+        correctLevel:
+          QRCode.CorrectLevel.H
+
+      }
+
+    );
+
+  }catch(error){
+
+    qrBox.innerHTML =
+      "<div style='color:red'>خطا در ساخت QR</div>";
+
+    console.error(error);
+
+  }
+
+}
+
+
+/* =====================================================
+   CLOSE QR
+===================================================== */
+
+function closeQR(){
+
+  document
+    .getElementById("qrModal")
+    .classList
+    .add("hidden");
+
+}
+
+
+/* =====================================================
+   DOWNLOAD QR
+===================================================== */
+
+function downloadQR(){
+
+  const box =
+    document.getElementById("qrcode");
+
+
+  const canvas =
+    box.querySelector("canvas");
+
+
+  const img =
+    box.querySelector("img");
+
+
+  let dataURL =
+    "";
+
+
+  if(canvas){
+
+    dataURL =
+      canvas.toDataURL("image/png");
+
+  }else if(img){
+
+    dataURL =
+      img.src;
+
+  }else{
+
+    alert(
+      "QR هنوز آماده نشده است."
+    );
+
+    return;
+  }
+
+
+  const a =
+    document.createElement("a");
+
+
+  a.href =
+    dataURL;
+
+
+  a.download =
+    "QR-" +
+    currentQRSerial +
+    "-" +
+    currentQRId +
+    ".png";
+
+
+  document
+    .body
+    .appendChild(a);
+
+
+  a.click();
+
+
+  a.remove();
+
+}
+
+
+/* =====================================================
+   PRINT QR
+===================================================== */
+
+function printQR(){
+
+  const box =
+    document.getElementById("qrcode");
+
+
+  const canvas =
+    box.querySelector("canvas");
+
+
+  const img =
+    box.querySelector("img");
+
+
+  let image =
+    "";
+
+
+  if(canvas){
+
+    image =
+      canvas.toDataURL("image/png");
+
+  }else if(img){
+
+    image =
+      img.src;
+
+  }else{
+
+    alert(
+      "QR آماده نیست."
+    );
+
+    return;
+  }
+
+
+  const serial =
+    currentQRSerial;
+
+
+  const id =
+    currentQRId;
+
+
+  const w =
+    window.open(
+      "",
+      "_blank",
+      "width=500,height=700"
+    );
+
+
+  if(!w){
+
+    alert(
+      "پنجره چاپ توسط مرورگر مسدود شده است."
+    );
+
+    return;
+  }
+
+
+  w.document.write(`
+
+    <!DOCTYPE html>
+
+    <html lang="fa" dir="rtl">
+
+    <head>
+
+      <meta charset="UTF-8">
+
+      <title>
+        QR نوبت ${esc(serial)}
+      </title>
+
+      <style>
+
+        body{
+
+          text-align:center;
+
+          font-family:
+            Tahoma,Arial,sans-serif;
+
+          padding:40px;
+
+        }
+
+        img{
+
+          width:240px;
+
+          height:240px;
+
+          margin:25px;
+
+        }
+
+        h2{
+
+          margin-bottom:10px;
+
+        }
+
+        .id{
+
+          color:#666;
+
+          font-size:13px;
+
+        }
+
+      </style>
+
+    </head>
+
+    <body>
+
+      <h2>QR نوبت</h2>
+
+      <img src="${image}">
+
+      <h3>
+
+        شماره نوبت:
+        ${esc(serial)}
+
+      </h3>
+
+      <div class="id">
+
+        شناسه اختصاصی:
+        ${esc(id)}
+
+      </div>
+
+      <script>
+
+        window.onload = function(){
+
+          setTimeout(function(){
+
+            window.print();
+
+          },500);
+
+        };
+
+      <\/script>
+
+    </body>
+
+    </html>
+
+  `);
+
+
+  w.document.close();
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+window.addEventListener(
+  "load",
+  async function(){
+
+    const ready =
+      initializeSupabase();
+
+
+    if(ready){
+
+      await checkSession();
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
