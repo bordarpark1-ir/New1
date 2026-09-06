@@ -1,1872 +1,2905 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>پنل مدیریت نوبت‌ها - Admin6</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>پنل مدیریت</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
 *{box-sizing:border-box}
 
 body{
-  margin:0;
-  background:#f3f5f7;
-  color:#222;
-  font-family:Tahoma,Arial,sans-serif;
-}
-
-.container{
-  width:94%;
-  max-width:1200px;
-  margin:20px auto;
-}
-
-.card{
-  background:#fff;
-  border-radius:14px;
-  padding:18px;
-  margin-bottom:18px;
-  box-shadow:0 2px 12px rgba(0,0,0,.07);
-}
-
-.login{
-  max-width:430px;
-  margin:60px auto;
-}
-
-h1,h2{
-  margin-top:0;
-}
-
-label{
-  display:block;
-  font-size:14px;
-  font-weight:bold;
-  margin-top:8px;
-}
-
-input{
-  width:100%;
-  padding:12px;
-  border:1px solid #ccc;
-  border-radius:9px;
-  font-size:15px;
-  font-family:inherit;
-  margin:5px 0 10px;
-}
-
-button{
-  border:0;
-  border-radius:9px;
-  padding:11px 16px;
-  font-family:inherit;
-  font-size:14px;
-  cursor:pointer;
-}
-
-button:active{
-  transform:scale(.98);
-}
-
-button:disabled{
-  opacity:.65;
-  cursor:not-allowed;
-}
-
-.primary{
-  background:#1683d8;
-  color:white;
-}
-
-.success{
-  background:#198754;
-  color:white;
-}
-
-.danger{
-  background:#d9363e;
-  color:white;
-}
-
-.secondary{
-  background:#eef1f4;
-  color:#333;
-}
-
-.qrbtn{
-  background:#6f42c1;
-  color:white;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-}
-
-.actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
+margin:0;
+background:#f4f6f8;
+color:#18212b;
+font-family:Tahoma,Arial,sans-serif
 }
 
 .top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
+background:#fff;
+border-bottom:1px solid #ddd;
+padding:14px 18px;
+display:flex;
+justify-content:space-between;
+position:sticky;
+top:0;
+z-index:5
 }
 
-.message{
-  display:none;
-  padding:12px;
-  border-radius:9px;
-  margin-bottom:12px;
+.wrap{
+max-width:1200px;
+margin:20px auto;
+padding:0 12px
+}
+
+.card{
+background:#fff;
+border:1px solid #e1e5e8;
+border-radius:15px;
+padding:18px;
+margin-bottom:18px;
+box-shadow:0 4px 18px #0000000a
+}
+
+.login{
+max-width:430px;
+margin:70px auto
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px
+}
+
+.f label{
+display:block;
+font-size:12px;
+font-weight:bold;
+margin-bottom:5px
+}
+
+.f input,
+.f textarea,
+.f select{
+width:100%;
+padding:10px;
+border:1px solid #d4d9de;
+border-radius:9px;
+font-family:inherit;
+background:#fff
+}
+
+.f textarea{
+min-height:90px
+}
+
+.s2{grid-column:span 2}
+.s4{grid-column:span 4}
+
+button{
+border:0;
+border-radius:9px;
+padding:9px 13px;
+cursor:pointer;
+font-family:inherit;
+font-weight:bold
+}
+
+.main{
+background:#18212b;
+color:#fff
+}
+
+.light{
+background:#edf1f4
+}
+
+.green{
+background:#177245;
+color:#fff
+}
+
+.red{
+background:#b42318;
+color:#fff
+}
+
+.actions{
+display:flex;
+gap:7px;
+flex-wrap:wrap;
+margin-top:14px
+}
+
+.msg{
+display:none;
+margin-top:10px;
+padding:10px;
+border-radius:9px;
+font-size:13px
+}
+
+.msg.show{display:block}
+
+.err{
+background:#fff1f2;
+color:#9f1239
 }
 
 .ok{
-  background:#e7f7ed;
-  color:#146c35;
+background:#ecfdf3;
+color:#166534
 }
 
-.err{
-  background:#ffe8e8;
-  color:#a40018;
+.toolbar{
+display:flex;
+justify-content:space-between;
+gap:10px;
+flex-wrap:wrap
 }
 
-.hidden{
-  display:none!important;
-}
-
-.small{
-  color:#666;
-  font-size:13px;
-}
-
-.table-wrap{
-  overflow:auto;
+.search{
+padding:10px;
+border:1px solid #ddd;
+border-radius:9px;
+min-width:280px
 }
 
 table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:1100px;
+width:100%;
+border-collapse:collapse;
+min-width:1050px
 }
 
 th,td{
-  padding:10px;
-  border-bottom:1px solid #eee;
-  text-align:right;
-  white-space:nowrap;
+padding:9px;
+border-bottom:1px solid #eee;
+text-align:right;
+font-size:12px
 }
 
 th{
-  background:#f7f8fa;
+background:#f8fafb
 }
 
-.badge{
-  padding:5px 9px;
-  border-radius:20px;
-  background:#e9f2ff;
-  color:#1467a5;
+.tw{
+overflow:auto
 }
 
-#qrModal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  z-index:9999;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:15px;
+.hint{
+font-size:12px;
+color:#667085;
+margin-top:5px
 }
 
-.qrBox{
-  background:white;
-  width:100%;
-  max-width:400px;
-  max-height:95vh;
-  overflow:auto;
-  border-radius:18px;
-  padding:25px;
-  text-align:center;
+.templateBadge{
+display:inline-block;
+padding:5px 9px;
+border-radius:999px;
+background:#eef2ff;
+font-size:11px;
+font-weight:bold
 }
 
-#qrcode{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  margin:20px 0;
-  min-height:240px;
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:#0007;
+z-index:20;
+overflow:auto;
+padding:15px
 }
 
-#qrcode img,
-#qrcode canvas{
-  max-width:100%;
-  height:auto;
+.modal.show{
+display:block
 }
 
-.qrSerial{
-  font-weight:bold;
-  font-size:17px;
-  margin-bottom:15px;
-  word-break:break-all;
+.panel{
+max-width:900px;
+margin:auto;
+background:#fff;
+padding:12px;
+border-radius:12px
 }
 
-.qrId{
-  color:#666;
-  font-size:12px;
-  margin-bottom:10px;
+.receipt{
+margin:auto;
+color:#111;
+background:#fff;
+direction:rtl
 }
 
-.qrUrl{
-  background:#f5f5f5;
-  border-radius:8px;
-  padding:8px;
-  font-size:11px;
-  direction:ltr;
-  word-break:break-all;
-  margin-bottom:15px;
+/* =========================
+   قالب بادپا
+========================= */
+
+.receipt-badpa{
+width:390px;
+border:1px solid #111;
+padding:10px;
+font-family:Tahoma,Arial,sans-serif;
+font-size:11px
 }
 
-@media(max-width:700px){
+.badpa-head{
+text-align:center;
+font-weight:bold;
+font-size:16px;
+margin-bottom:7px
+}
 
-  .grid{
-    grid-template-columns:1fr;
-  }
+.badpa-sub{
+text-align:center;
+margin-bottom:7px
+}
 
-  .container{
-    width:96%;
-    margin:12px auto;
-  }
+.badpa-info{
+border-top:1px solid #111;
+border-right:1px solid #111
+}
 
-  .login{
-    margin:30px auto;
-  }
+.badpa-row{
+display:grid;
+grid-template-columns:1fr 1fr;
+border-bottom:1px solid #111
+}
 
-  .card{
-    padding:14px;
-  }
+.badpa-cell{
+padding:5px;
+border-left:1px solid #111;
+min-height:28px
+}
 
-  h1{
-    font-size:22px;
-  }
+.badpa-cell:last-child{
+border-left:0
+}
 
-  h2{
-    font-size:19px;
-  }
+.badpa-money{
+margin-top:7px;
+border:1px solid #111
+}
 
-  button{
-    padding:10px 13px;
-  }
+.badpa-money-row{
+display:grid;
+grid-template-columns:1fr 120px;
+border-bottom:1px solid #111
+}
+
+.badpa-money-row:last-child{
+border-bottom:0
+}
+
+.badpa-money-row div{
+padding:5px
+}
+
+.badpa-money-row div:last-child{
+border-right:1px solid #111;
+text-align:center
+}
+
+.badpa-cargo{
+text-align:center;
+font-weight:bold;
+margin:8px 0
+}
+
+.badpa-note{
+text-align:center;
+line-height:1.9;
+margin-top:7px
+}
+
+.badpa-qr{
+display:flex;
+justify-content:center;
+margin-top:8px
+}
+
+.badpa-code{
+text-align:center;
+font-size:10px;
+margin-top:5px;
+word-break:break-all
+}
+
+/* =========================
+   قالب سنوار حیات
+========================= */
+
+.receipt-senvar{
+width:390px;
+border:1px solid #111;
+padding:9px;
+font-family:Tahoma,Arial,sans-serif;
+font-size:11px
+}
+
+.senvar-top{
+text-align:center;
+font-weight:bold;
+font-size:16px;
+margin-bottom:7px
+}
+
+.senvar-plate{
+border:1px solid #111;
+padding:7px;
+text-align:center;
+font-size:14px;
+font-weight:bold
+}
+
+.senvar-meta{
+border:1px solid #111;
+border-top:0
+}
+
+.senvar-meta-row{
+display:grid;
+grid-template-columns:1fr 1fr;
+border-bottom:1px solid #111
+}
+
+.senvar-meta-row:last-child{
+border-bottom:0
+}
+
+.senvar-meta-row div{
+padding:5px;
+border-left:1px solid #111
+}
+
+.senvar-meta-row div:last-child{
+border-left:0
+}
+
+.senvar-appointment{
+text-align:center;
+padding:6px;
+border:1px solid #111;
+border-top:0;
+font-weight:bold
+}
+
+.senvar-main{
+border:1px solid #111;
+margin-top:8px
+}
+
+.senvar-title{
+text-align:center;
+font-weight:bold;
+font-size:15px;
+padding:7px;
+border-bottom:1px solid #111
+}
+
+.senvar-row{
+display:grid;
+grid-template-columns:1fr 150px;
+border-bottom:1px solid #111
+}
+
+.senvar-row:last-child{
+border-bottom:0
+}
+
+.senvar-row div{
+padding:5px
+}
+
+.senvar-row div:last-child{
+border-right:1px solid #111;
+text-align:center
+}
+
+.senvar-trip{
+text-align:center;
+font-weight:bold;
+margin-top:7px
+}
+
+.senvar-qr{
+display:flex;
+justify-content:center;
+margin-top:8px
+}
+
+.senvar-code{
+text-align:center;
+font-size:10px;
+margin-top:5px;
+word-break:break-all
+}
+
+.hidden{
+display:none!important
+}
+
+@media(max-width:850px){
+
+.grid{
+grid-template-columns:repeat(2,1fr)
+}
+
+.s4{
+grid-column:span 2
+}
+
+}
+
+@media(max-width:550px){
+
+.grid{
+grid-template-columns:1fr
+}
+
+.s2,
+.s4{
+grid-column:span 1
+}
+
+.receipt-badpa,
+.receipt-senvar{
+width:100%;
+max-width:390px
+}
+
+}
+
+@media print{
+
+body *{
+visibility:hidden!important
+}
+
+.receipt,
+.receipt *{
+visibility:visible!important
+}
+
+.modal{
+display:block!important;
+position:absolute!important;
+background:#fff!important;
+padding:0!important
+}
+
+.panel{
+padding:0!important
+}
+
+.mb{
+display:none!important
+}
+
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
+<!-- ================= LOGIN ================= -->
 
-<div id="loginBox" class="card login">
+<div id="loginPage">
 
-  <h1>ورود مدیریت</h1>
+<div class="card login">
 
-  <p>برای مدیریت نوبت‌ها وارد شوید.</p>
+<h2>پنل مدیریت</h2>
 
-  <div id="loginMsg" class="message err"></div>
+<p>ورود مدیر سامانه</p>
 
-  <label>ایمیل مدیر</label>
+<div class="f">
+<label>ایمیل</label>
+<input id="email" type="email">
+</div>
 
-  <input
-    id="email"
-    type="email"
-    autocomplete="username"
-    placeholder="admin@example.com"
-  >
+<div class="f" style="margin-top:10px">
+<label>رمز عبور</label>
+<input id="password" type="password">
+</div>
 
-  <label>رمز عبور</label>
+<div class="actions">
 
-  <input
-    id="password"
-    type="password"
-    autocomplete="current-password"
-    placeholder="رمز عبور"
-  >
+<button
+id="loginBtn"
+class="main"
+onclick="login()">
+ورود
+</button>
 
-  <button
-    id="loginButton"
-    class="primary"
-    style="width:100%"
-    onclick="login()"
-  >
-    ورود به پنل
-  </button>
+</div>
+
+<div id="loginMsg" class="msg"></div>
+
+</div>
 
 </div>
 
 
-<!-- ADMIN -->
+<!-- ================= ADMIN ================= -->
 
-<div id="app" class="container hidden">
+<div id="adminPage" style="display:none">
 
-  <div class="card">
+<div class="top">
 
-    <div class="top">
+<b>مدیریت نوبت‌ها</b>
 
-      <div>
+<div>
 
-        <h1>پنل مدیریت نوبت‌ها</h1>
+<button
+class="light"
+onclick="goHome()">
+⌂ خانه
+</button>
 
-        <div id="userInfo" class="small"></div>
+<button
+class="light"
+onclick="logout()">
+خروج
+</button>
 
-      </div>
-
-      <button
-        class="secondary"
-        onclick="logout()"
-      >
-        خروج
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <div id="mainMsg" class="message"></div>
-
-
-  <!-- FORM -->
-
-  <div class="card">
-
-    <div class="top">
-
-      <h2 id="formTitle">
-        ثبت نوبت جدید
-      </h2>
-
-      <button
-        class="secondary"
-        onclick="clearForm()"
-      >
-        فرم جدید
-      </button>
-
-    </div>
-
-
-    <input
-      type="hidden"
-      id="editId"
-    >
-
-
-    <div class="grid">
-
-      <div>
-        <label>شماره نوبت / سریال</label>
-        <input id="serial" placeholder="مثلاً FN050501269">
-      </div>
-
-      <div>
-        <label>نام مرز</label>
-        <input id="border_name" placeholder="نام مرز">
-      </div>
-
-      <div>
-        <label>نوع صف</label>
-        <input id="queue_type" placeholder="نوع صف">
-      </div>
-
-      <div>
-        <label>شماره پلاک</label>
-        <input id="plate_number" placeholder="شماره پلاک">
-      </div>
-
-      <div>
-        <label>نوع نوبت</label>
-        <input id="appointment_type" placeholder="نوع نوبت">
-      </div>
-
-      <div>
-        <label>تاریخ / زمان دریافت</label>
-        <input id="received_at" placeholder="تاریخ و ساعت">
-      </div>
-
-      <div>
-        <label>وضعیت</label>
-        <input id="status" placeholder="مثلاً در انتظار">
-      </div>
-
-      <div>
-        <label>ترمینال</label>
-        <input id="terminal" placeholder="ترمینال">
-      </div>
-
-      <div>
-        <label>شماره سرویس</label>
-        <input id="service_number" placeholder="شماره سرویس">
-      </div>
-
-      <div>
-        <label>ورود به ترمینال</label>
-        <input id="entered_terminal_at" placeholder="تاریخ و ساعت">
-      </div>
-
-      <div>
-        <label>فراخوانی</label>
-        <input id="called_at" placeholder="تاریخ و ساعت">
-      </div>
-
-      <div>
-        <label>خروج از ترمینال</label>
-        <input id="exited_terminal_at" placeholder="تاریخ و ساعت">
-      </div>
-
-      <div>
-        <label>مجاز شدن گمرک</label>
-        <input id="allowed_customs_at" placeholder="تاریخ و ساعت">
-      </div>
-
-    </div>
-
-
-    <div class="actions">
-
-      <button
-        class="primary"
-        onclick="saveAppointment()"
-      >
-        ذخیره نوبت
-      </button>
-
-      <button
-        class="secondary"
-        onclick="clearForm()"
-      >
-        پاک کردن فرم
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- LIST -->
-
-  <div class="card">
-
-    <div class="top">
-
-      <h2>لیست نوبت‌ها</h2>
-
-      <button
-        class="secondary"
-        onclick="loadAppointments()"
-      >
-        🔄 بروزرسانی
-      </button>
-
-    </div>
-
-
-    <input
-      id="search"
-      placeholder="جستجو بر اساس شماره نوبت یا پلاک..."
-      oninput="filterRows()"
-    >
-
-
-    <div class="table-wrap">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>سریال</th>
-            <th>پلاک</th>
-            <th>وضعیت</th>
-            <th>مرز</th>
-            <th>نوع صف</th>
-            <th>تاریخ دریافت</th>
-            <th>شناسه</th>
-            <th>عملیات</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="tableBody"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
+</div>
 
 </div>
 
 
-<!-- QR -->
+<main class="wrap">
 
-<div id="qrModal" class="hidden">
 
-  <div class="qrBox">
+<!-- ================= FORM ================= -->
 
-    <h2>QR اختصاصی نوبت</h2>
+<div class="card">
 
-    <div id="qrcode"></div>
+<h2 id="formTitle">
+ثبت نوبت جدید
+</h2>
 
-    <div id="qrSerial" class="qrSerial"></div>
+<p>
+اطلاعات نوبت و رسید از اینجا قابل ویرایش است.
+</p>
 
-    <div id="qrId" class="qrId"></div>
+<input
+type="hidden"
+id="editId"
+>
 
-    <div id="qrUrl" class="qrUrl"></div>
 
-    <div
-      class="actions"
-      style="justify-content:center"
-    >
+<div class="grid">
 
-      <button
-        class="success"
-        onclick="downloadQR()"
-      >
-        ⬇️ دانلود QR
-      </button>
 
-      <button
-        class="primary"
-        onclick="printQR()"
-      >
-        🖨 چاپ QR
-      </button>
+<div class="f">
+<label>شماره نوبت / سریال</label>
+<input id="serial">
+</div>
 
-      <button
-        class="secondary"
-        onclick="closeQR()"
-      >
-        بستن
-      </button>
 
-    </div>
+<div class="f">
+<label>نام مرز</label>
+<input id="border_name">
+</div>
 
-  </div>
 
+<div class="f">
+<label>نوع صف</label>
+<input id="queue_type">
+</div>
+
+
+<div class="f">
+<label>پلاک</label>
+<input id="plate_number">
+</div>
+
+
+<div class="f">
+<label>نوع نوبت</label>
+<input id="appointment_type">
+</div>
+
+
+<div class="f">
+<label>زمان دریافت</label>
+<input id="received_at" type="datetime-local">
+</div>
+
+
+<div class="f">
+<label>وضعیت</label>
+<input id="status">
+</div>
+
+
+<div class="f">
+<label>ترمینال</label>
+<input id="terminal">
+</div>
+
+
+<div class="f">
+<label>شماره خدمت</label>
+<input id="service_number">
+</div>
+
+
+<div class="f">
+<label>ورود به ترمینال</label>
+<input id="entered_terminal_at" type="datetime-local">
+</div>
+
+
+<div class="f">
+<label>فراخوان</label>
+<input id="called_at" type="datetime-local">
+</div>
+
+
+<div class="f">
+<label>خروج از ترمینال</label>
+<input id="exited_terminal_at" type="datetime-local">
+</div>
+
+
+<div class="f">
+<label>مجاز گمرک</label>
+<input id="allowed_customs_at" type="datetime-local">
+</div>
+
+
+<!-- PARKING -->
+
+<div class="f">
+
+<label>
+اسم پارکینگ / مجموعه
+</label>
+
+<input
+id="parking_name"
+placeholder="بادپا – ریمدان یا سنوار حیات – ریمدان"
+oninput="showTemplateHint()"
+>
+
+</div>
+
+
+<!-- TEMPLATE -->
+
+<div class="f">
+
+<label>
+قالب رسید
+</label>
+
+<select
+id="receipt_template"
+onchange="showTemplateHint()"
+>
+
+<option value="auto">
+تشخیص خودکار از اسم پارکینگ
+</option>
+
+<option value="badpa">
+بادپا – ریمدان
+</option>
+
+<option value="senvar">
+سنوار حیات – ریمدان
+</option>
+
+</select>
+
+<div
+id="templateHint"
+class="hint">
+</div>
+
+</div>
+
+
+<!-- BADPA -->
+
+<div class="f">
+
+<label>
+ترانزیت (فقط بادپا)
+</label>
+
+<input id="receipt_transit">
+
+</div>
+
+
+<div class="f">
+
+<label>
+نوع ناوگان
+</label>
+
+<input id="receipt_vehicle_type">
+
+</div>
+
+
+<div class="f">
+
+<label>
+وضعیت بار
+</label>
+
+<input id="receipt_load_status">
+
+</div>
+
+
+<div class="f">
+
+<label>
+ورود روی رسید
+</label>
+
+<input id="receipt_entry_time">
+
+</div>
+
+
+<div class="f">
+
+<label>
+فراخوان روی رسید
+</label>
+
+<input id="receipt_call_time">
+
+</div>
+
+
+<div class="f">
+
+<label>
+خروج روی رسید
+</label>
+
+<input id="receipt_exit_time">
+
+</div>
+
+
+<div class="f">
+
+<label>
+مدت پارک (بادپا)
+</label>
+
+<input id="parking_duration">
+
+</div>
+
+
+<!-- MONEY -->
+
+<div class="f">
+
+<label>
+خدمات پارکینگ
+</label>
+
+<input id="parking_service">
+
+</div>
+
+
+<div class="f">
+
+<label>
+خدمات شهرداری
+</label>
+
+<input id="municipality_service">
+</div>
+
+
+<div class="f">
+
+<label>
+مالیات ارزش افزوده
+</label>
+
+<input id="vat">
+
+</div>
+
+
+<div class="f">
+
+<label>
+جمع پرداختی
+</label>
+
+<input id="total_payment">
+
+</div>
+
+
+<!-- SENVAR -->
+
+<div class="f">
+
+<label>
+شناسه سفر (فقط سنوار)
+</label>
+
+<input id="trip_id">
+
+</div>
+
+
+<div class="f">
+
+<label>
+عنوان بار
+</label>
+
+<input id="cargo_title">
+
+</div>
+
+
+<div class="f s2">
+
+<label>
+کد پایین رسید
+</label>
+
+<input id="receipt_code">
+
+</div>
+
+
+<div class="f s4">
+
+<label>
+متن توضیحات رسید (بادپا)
+</label>
+
+<textarea id="receipt_note">راننده گرامی توجه داشته باشید
+انقضا قبض شما: [زمان انقضا]
+درصورت مراجعه بعد از زمان مذکور از پذیرش شما با این قبض معذور میباشیم</textarea>
+
+</div>
+
+
+<div class="f">
+
+<label>
+زمان پایین رسید سنوار
+</label>
+
+<input
+id="senvar_footer_time"
+placeholder="ب.ظ 09:40:14 1405/05/26"
+>
+
+</div>
+
+
+</div>
+
+
+<div class="actions">
+
+<button
+id="saveBtn"
+class="main"
+onclick="saveAppointment()">
+ذخیره نوبت
+</button>
+
+
+<button
+class="light"
+onclick="resetForm()">
+پاک کردن
+</button>
+
+
+<button
+class="green"
+onclick="preview()">
+پیش‌نمایش رسید
+</button>
+
+</div>
+
+
+<div id="formMsg" class="msg"></div>
+
+</div>
+
+
+<!-- ================= LIST ================= -->
+
+<div class="card">
+
+<div class="toolbar">
+
+<div>
+
+<h2>لیست نوبت‌ها</h2>
+
+<span id="count"></span>
+
+</div>
+
+
+<input
+id="search"
+class="search"
+oninput="render()"
+placeholder="جستجو سریال، پلاک، مرز..."
+>
+
+</div>
+
+
+<div class="actions">
+
+<button
+class="light"
+onclick="load()">
+↻ بروزرسانی
+</button>
+
+</div>
+
+
+<div class="tw">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>سریال</th>
+<th>پلاک</th>
+<th>مرز</th>
+<th>پارکینگ</th>
+<th>نوع نوبت</th>
+<th>وضعیت</th>
+<th>عملیات</th>
+
+</tr>
+
+</thead>
+
+<tbody id="body"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+
+<!-- ================= RECEIPT MODAL ================= -->
+
+<div
+id="modal"
+class="modal">
+
+<div class="panel">
+
+
+<div
+class="mb"
+style="display:flex;justify-content:space-between;margin-bottom:10px">
+
+<b id="modalTitle">
+رسید نوبت + QR
+</b>
+
+
+<div>
+
+<button
+class="green"
+onclick="printReceipt()">
+چاپ
+</button>
+
+<button
+class="light"
+onclick="closeReceipt()">
+بستن
+</button>
+
+</div>
+
+</div>
+
+
+<!-- =================================================
+     BADPA RECEIPT
+================================================= -->
+
+<div
+id="receiptBadpa"
+class="receipt receipt-badpa">
+
+<div
+class="badpa-head"
+id="bParking">
+بادپا – ریمدان
+</div>
+
+
+<div class="badpa-sub">
+
+ترانزیت
+<span id="bTransit"></span>
+
+</div>
+
+
+<div class="badpa-info">
+
+
+<div class="badpa-row">
+
+<div class="badpa-cell">
+
+زمان ورود
+<span id="bEntry"></span>
+
+</div>
+
+
+<div class="badpa-cell">
+
+نوع ناوگان
+<span id="bVehicle"></span>
+
+</div>
+
+</div>
+
+
+<div class="badpa-row">
+
+<div class="badpa-cell">
+
+وضعیت
+<span id="bLoad"></span>
+
+</div>
+
+
+<div class="badpa-cell">
+
+پلاک
+<span id="bPlate"></span>
+
+</div>
+
+</div>
+
+
+<div class="badpa-row">
+
+<div class="badpa-cell">
+
+فراخوان
+<span id="bCall"></span>
+
+</div>
+
+
+<div class="badpa-cell">
+
+زمان خروج
+<span id="bExit"></span>
+
+</div>
+
+</div>
+
+
+<div class="badpa-row">
+
+<div class="badpa-cell">
+
+مدت پارک
+<span id="bDuration"></span>
+
+</div>
+
+
+<div class="badpa-cell"></div>
+
+</div>
+
+
+</div>
+
+
+<div class="badpa-money">
+
+
+<div class="badpa-money-row">
+
+<div>
+خدمات پارکینگ
+</div>
+
+<div id="bParkingMoney"></div>
+
+</div>
+
+
+<div class="badpa-money-row">
+
+<div>
+تاخیر در خروج
+</div>
+
+<div>
+0
+</div>
+
+</div>
+
+
+<div class="badpa-money-row">
+
+<div>
+خدمات شهرداری
+</div>
+
+<div id="bMunicipality"></div>
+
+</div>
+
+
+<div class="badpa-money-row">
+
+<div>
+مالیات ارزش افزوده
+</div>
+
+<div id="bVat"></div>
+
+</div>
+
+
+<div class="badpa-money-row">
+
+<div>
+<b>جمع پرداختی</b>
+</div>
+
+<div id="bTotal"></div>
+
+</div>
+
+
+</div>
+
+
+<div
+class="badpa-cargo"
+id="bCargo">
+تانکر صادرات گاز
+</div>
+
+
+<div
+class="badpa-note"
+id="bNote">
+</div>
+
+
+<div class="badpa-qr">
+
+<div id="qrBadpa"></div>
+
+</div>
+
+
+<div
+class="badpa-code"
+id="bCode">
+</div>
+
+</div>
+
+
+<!-- =================================================
+     SENVAR RECEIPT
+================================================= -->
+
+<div
+id="receiptSenvar"
+class="receipt receipt-senvar hidden">
+
+
+<div
+class="senvar-top"
+id="sParking">
+سنوار حیات - - 18369
+</div>
+
+
+<div class="senvar-plate">
+
+پلاک
+<span id="sPlate"></span>
+
+</div>
+
+
+<div class="senvar-meta">
+
+
+<div class="senvar-meta-row">
+
+<div>
+
+نوع ناوگان
+<span id="sVehicle"></span>
+
+</div>
+
+
+<div>
+
+<span id="sLoad"></span>
+
+</div>
+
+</div>
+
+
+<div class="senvar-meta-row">
+
+<div>
+دریافت نوبت
+</div>
+
+<div id="sReceive"></div>
+
+</div>
+
+
+</div>
+
+
+<div
+class="senvar-appointment"
+id="sAppointment">
+
+گاز &nbsp;&nbsp;
+صادرات &nbsp;&nbsp;
+تانکر
+
+</div>
+
+
+<div class="senvar-main">
+
+
+<div
+class="senvar-title"
+id="sTitle">
+سنوار حیات - ریمدان
+</div>
+
+
+<div class="senvar-row">
+
+<div>
+زمان ورود
+</div>
+
+<div id="sEntry"></div>
+
+</div>
+
+
+<div class="senvar-row">
+
+<div>
+فراخوان
+</div>
+
+<div id="sCall"></div>
+
+</div>
+
+
+<div class="senvar-row">
+
+<div>
+زمان خروج
+</div>
+
+<div id="sExit"></div>
+
+</div>
+
+
+<div class="senvar-row">
+
+<div>
+خدمات پارکینگ
+</div>
+
+<div id="sParkingMoney"></div>
+
+</div>
+
+
+<div class="senvar-row">
+
+<div>
+تاخیر در خروج
+</div>
+
+<div>
+0
+</div>
+
+</div>
+
+
+<div class="senvar-row">
+
+<div>
+خدمات شهرداری
+</div>
+
+<div id="sMunicipality"></div>
+
+</div>
+
+
+<div class="senvar-row">
+
+<div>
+مالیات ارزش افزوده
+</div>
+
+<div id="sVat"></div>
+
+</div>
+
+
+<div class="senvar-row">
+
+<div>
+<b>جمع پرداختی</b>
+</div>
+
+<div id="sTotal"></div>
+
+</div>
+
+
+</div>
+
+
+<div class="senvar-trip">
+
+شناسه سفر سامانه جامع حمل و نقل:
+
+<span id="sTrip"></span>
+
+</div>
+
+
+<div class="senvar-qr">
+
+<div id="qrSenvar"></div>
+
+</div>
+
+
+<div
+class="senvar-code"
+id="sFooter">
+</div>
+
+
+</div>
+
+
+</div>
 </div>
 
 
 <script>
 
-/* =====================================================
-   بررسی اولیه
-===================================================== */
-
-let supabaseClient = null;
-
+let sb = null;
 let rows = [];
 
-let currentQRSerial = "";
 
-let currentQRId = "";
-
-let currentQRUrl = "";
-
-
-/* =====================================================
-   اتصال به Supabase
-===================================================== */
-
-function initializeSupabase(){
-
-  try{
-
-    if(!window.supabase){
-
-      showLoginError(
-        "کتابخانه Supabase بارگذاری نشده است. اینترنت را بررسی کنید."
-      );
-
-      return false;
-    }
+/* سایت اصلی خودت */
+const SITE =
+'https://bordarpark1-ir.github.io/New1/';
 
 
-    if(
-      !window.SUPABASE_URL ||
-      !window.SUPABASE_ANON_KEY
-    ){
+/* ================= INIT ================= */
 
-      showLoginError(
-        "اطلاعات اتصال Supabase در config.js پیدا نشد."
-      );
+function init(){
 
-      return false;
-    }
+if(
+!window.supabase ||
+!window.SUPABASE_URL ||
+!window.SUPABASE_ANON_KEY
+){
 
+msg(
+'loginMsg',
+'Supabase یا config.js بارگذاری نشده است.',
+1
+);
 
-    supabaseClient =
-      window.supabase.createClient(
-        window.SUPABASE_URL,
-        window.SUPABASE_ANON_KEY
-      );
+return false;
 
+}
 
-    return true;
+sb =
+window.supabase.createClient(
+window.SUPABASE_URL,
+window.SUPABASE_ANON_KEY
+);
 
-  }catch(error){
-
-    showLoginError(
-      "خطا در اتصال به Supabase: " +
-      error.message
-    );
-
-    return false;
-  }
+return true;
 
 }
 
 
-/* =====================================================
-   پیام خطای ورود
-===================================================== */
+/* ================= HELPERS ================= */
 
-function showLoginError(text){
+function msg(id,text,error){
 
-  const msg =
-    document.getElementById("loginMsg");
+let x =
+document.getElementById(id);
 
-  msg.textContent = text;
+x.textContent = text;
 
-  msg.className =
-    "message err";
-
-  msg.style.display = "block";
+x.className =
+'msg show ' +
+(error ? 'err' : 'ok');
 
 }
 
 
-/* =====================================================
-   LOGIN
-===================================================== */
+function hide(id){
+
+document.getElementById(id).className =
+'msg';
+
+}
+
+
+function esc(v){
+
+return String(v ?? '').replace(
+/[&<>"']/g,
+m => ({
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#039;'
+}[m])
+);
+
+}
+
+
+function money(v){
+
+let n =
+Number(
+String(v ?? '').replace(/,/g,'')
+);
+
+return Number.isFinite(n)
+? n.toLocaleString('en-US')
+: v || '0';
+
+}
+
+
+function dt(v){
+
+if(!v) return '';
+
+let d =
+new Date(v);
+
+if(isNaN(d))
+return String(v);
+
+return d.getFullYear()
++'-'+
+String(d.getMonth()+1).padStart(2,'0')
++'-'+
+String(d.getDate()).padStart(2,'0')
++' '+
+String(d.getHours()).padStart(2,'0')
++':'+
+String(d.getMinutes()).padStart(2,'0');
+
+}
+
+
+function inp(v){
+
+if(!v) return '';
+
+let d =
+new Date(v);
+
+if(isNaN(d))
+return '';
+
+return d.getFullYear()
++'-'+
+String(d.getMonth()+1).padStart(2,'0')
++'-'+
+String(d.getDate()).padStart(2,'0')
++'T'+
+String(d.getHours()).padStart(2,'0')
++':'+
+String(d.getMinutes()).padStart(2,'0');
+
+}
+
+
+function val(id){
+
+return document.getElementById(id).value;
+
+}
+
+
+function set(id,v){
+
+document.getElementById(id).value =
+v ?? '';
+
+}
+
+
+function iso(id){
+
+let v = val(id);
+
+return v
+? new Date(v).toISOString()
+: null;
+
+}
+
+
+function goHome(){
+
+location.href = SITE;
+
+}
+
+
+/* ================= TEMPLATE ================= */
+
+function templateFor(a){
+
+let chosen =
+a.receipt_template || 'auto';
+
+
+if(
+chosen === 'badpa' ||
+chosen === 'senvar'
+)
+return chosen;
+
+
+let n =
+String(a.parking_name || '')
+.toLowerCase();
+
+
+if(
+n.includes('سنوار') ||
+n.includes('senvar')
+){
+
+return 'senvar';
+
+}
+
+
+return 'badpa';
+
+}
+
+
+function showTemplateHint(){
+
+let t =
+templateFor({
+parking_name:val('parking_name'),
+receipt_template:val('receipt_template')
+});
+
+
+document.getElementById(
+'templateHint'
+).textContent =
+t === 'senvar'
+? 'قالب فعال: سنوار حیات'
+: 'قالب فعال: بادپا – ریمدان';
+
+}
+
+
+/* ================= LOGIN ================= */
 
 async function login(){
 
-  const email =
-    document
-      .getElementById("email")
-      .value
-      .trim();
+hide('loginMsg');
 
-  const password =
-    document
-      .getElementById("password")
-      .value;
-
-  const msg =
-    document.getElementById("loginMsg");
-
-  const button =
-    document.getElementById("loginButton");
+if(!sb && !init())
+return;
 
 
-  msg.style.display = "none";
+let email =
+val('email').trim();
+
+let password =
+val('password');
 
 
-  if(!email || !password){
+if(!email || !password){
 
-    showLoginError(
-      "ایمیل و رمز عبور را وارد کنید."
-    );
+msg(
+'loginMsg',
+'ایمیل و رمز عبور را وارد کنید.',
+1
+);
 
-    return;
-  }
-
-
-  if(!supabaseClient){
-
-    const ready =
-      initializeSupabase();
-
-    if(!ready){
-
-      return;
-    }
-
-  }
-
-
-  button.disabled = true;
-
-  button.textContent =
-    "در حال ورود...";
-
-
-  try{
-
-    const result =
-      await supabaseClient.auth.signInWithPassword({
-
-        email:email,
-        password:password
-
-      });
-
-
-    if(result.error){
-
-      showLoginError(
-        "ورود ناموفق بود: " +
-        result.error.message
-      );
-
-      return;
-    }
-
-
-    if(
-      !result.data ||
-      !result.data.user
-    ){
-
-      showLoginError(
-        "ورود انجام نشد. اطلاعات حساب مدیر را بررسی کنید."
-      );
-
-      return;
-    }
-
-
-    await showApp(
-      result.data.user
-    );
-
-
-  }catch(error){
-
-    showLoginError(
-      "خطای غیرمنتظره هنگام ورود: " +
-      error.message
-    );
-
-  }finally{
-
-    button.disabled = false;
-
-    button.textContent =
-      "ورود به پنل";
-
-  }
+return;
 
 }
 
 
-/* =====================================================
-   SESSION
-===================================================== */
+let b =
+document.getElementById('loginBtn');
 
-async function checkSession(){
-
-  if(!supabaseClient){
-
-    return;
-  }
+b.disabled = true;
+b.textContent =
+'در حال ورود...';
 
 
-  try{
+try{
 
-    const result =
-      await supabaseClient.auth.getSession();
+let {
+data,
+error
+} =
+await sb.auth.signInWithPassword({
+email,
+password
+});
 
 
-    if(
-      result.data &&
-      result.data.session
-    ){
+if(error)
+throw error;
 
-      await showApp(
-        result.data.session.user
-      );
 
-    }
+if(!data.user)
+throw Error('ورود انجام نشد');
 
-  }catch(error){
 
-    showLoginError(
-      "خطا در بررسی ورود: " +
-      error.message
-    );
+document.getElementById(
+'loginPage'
+).style.display =
+'none';
 
-  }
+
+document.getElementById(
+'adminPage'
+).style.display =
+'block';
+
+
+await load();
+
+
+}
+catch(e){
+
+msg(
+'loginMsg',
+'خطا در ورود: '+e.message,
+1
+);
+
+}
+finally{
+
+b.disabled = false;
+
+b.textContent =
+'ورود';
+
+}
 
 }
 
 
-/* =====================================================
-   SHOW APP
-===================================================== */
+/* ================= SESSION ================= */
 
-async function showApp(user){
+async function session(){
 
-  document
-    .getElementById("loginBox")
-    .classList
-    .add("hidden");
+try{
 
-
-  document
-    .getElementById("app")
-    .classList
-    .remove("hidden");
+let {
+data
+} =
+await sb.auth.getSession();
 
 
-  document
-    .getElementById("userInfo")
-    .textContent =
-      "مدیر وارد شده: " +
-      (user.email || "");
+if(data.session){
+
+document.getElementById(
+'loginPage'
+).style.display =
+'none';
 
 
-  await loadAppointments();
+document.getElementById(
+'adminPage'
+).style.display =
+'block';
+
+
+await load();
+
+}
+
+}
+catch(e){}
 
 }
 
 
-/* =====================================================
-   LOGOUT
-===================================================== */
+/* ================= LOGOUT ================= */
 
 async function logout(){
 
-  try{
+await sb.auth.signOut();
 
-    if(supabaseClient){
-
-      await supabaseClient.auth.signOut();
-
-    }
-
-  }catch(error){
-
-    console.error(error);
-
-  }
-
-  location.reload();
+location.reload();
 
 }
 
 
-/* =====================================================
-   MESSAGE
-===================================================== */
+/* ================= LOAD ================= */
 
-function showMessage(text,type="ok"){
+async function load(){
 
-  const box =
-    document.getElementById("mainMsg");
-
-
-  box.className =
-    "message " +
-    (
-      type === "ok"
-        ? "ok"
-        : "err"
-    );
+document.getElementById(
+'body'
+).innerHTML =
+'<tr><td colspan="7">در حال دریافت...</td></tr>';
 
 
-  box.textContent =
-    text;
+try{
+
+let {
+data,
+error
+} =
+await sb
+.from('appointments')
+.select('*')
+.order(
+'id',
+{
+ascending:false
+}
+);
 
 
-  box.style.display =
-    "block";
+if(error)
+throw error;
 
 
-  setTimeout(function(){
+rows =
+data || [];
 
-    box.style.display =
-      "none";
 
-  },4000);
+render();
+
+
+}
+catch(e){
+
+document.getElementById(
+'body'
+).innerHTML =
+'<tr><td colspan="7">خطا: '+
+esc(e.message)+
+'</td></tr>';
+
+}
 
 }
 
 
-/* =====================================================
-   FIELDS
-===================================================== */
+/* ================= RENDER ================= */
 
-const fields = [
+function render(){
 
-  "serial",
-  "border_name",
-  "queue_type",
-  "plate_number",
-  "appointment_type",
-  "received_at",
-  "status",
-  "terminal",
-  "service_number",
-  "entered_terminal_at",
-  "called_at",
-  "exited_terminal_at",
-  "allowed_customs_at"
-
-];
+let q =
+val('search')
+.trim()
+.toLowerCase();
 
 
-/* =====================================================
-   FORM
-===================================================== */
+let a =
+rows.filter(x =>
+!q ||
+[
+x.serial,
+x.plate_number,
+x.border_name,
+x.parking_name,
+x.queue_type,
+x.appointment_type,
+x.status,
+x.terminal
+]
+.some(v =>
+String(v ?? '')
+.toLowerCase()
+.includes(q)
+)
+);
 
-function getFormObject(){
 
-  const obj = {};
-
-
-  fields.forEach(function(id){
-
-    obj[id] =
-      document
-        .getElementById(id)
-        .value
-        .trim();
-
-  });
+document.getElementById(
+'count'
+).textContent =
+a.length+' نوبت';
 
 
-  return obj;
+document.getElementById(
+'body'
+).innerHTML =
+
+a.length
+
+?
+
+a.map(x => `
+
+<tr>
+
+<td>
+${esc(x.serial)}
+</td>
+
+<td>
+${esc(x.plate_number)}
+</td>
+
+<td>
+${esc(x.border_name)}
+</td>
+
+<td>
+
+<span class="templateBadge">
+
+${esc(
+x.parking_name ||
+(
+templateFor(x)==='senvar'
+?
+'سنوار حیات'
+:
+'بادپا – ریمدان'
+)
+)}
+
+</span>
+
+</td>
+
+<td>
+${esc(x.appointment_type)}
+</td>
+
+<td>
+${esc(x.status)}
+</td>
+
+<td>
+
+<button
+class="light"
+onclick="edit(${x.id})">
+ویرایش
+</button>
+
+
+<button
+class="green"
+onclick="receipt(${x.id})">
+رسید + QR
+</button>
+
+
+<button
+class="main"
+onclick="publicPage(${x.id})">
+استعلام
+</button>
+
+
+<button
+class="red"
+onclick="del(${x.id})">
+حذف
+</button>
+
+</td>
+
+</tr>
+
+`).join('')
+
+:
+
+'<tr><td colspan="7">نوبتی پیدا نشد.</td></tr>';
 
 }
 
 
-/* =====================================================
-   SAVE
-===================================================== */
+/* ================= EDIT ================= */
+
+function edit(id){
+
+let a =
+rows.find(
+x => +x.id === +id
+);
+
+
+if(!a)
+return;
+
+
+set(
+'editId',
+a.id
+);
+
+
+[
+'serial',
+'border_name',
+'queue_type',
+'plate_number',
+'appointment_type',
+'status',
+'terminal',
+'service_number',
+'parking_name',
+'receipt_template',
+'receipt_transit',
+'receipt_vehicle_type',
+'receipt_load_status',
+'receipt_entry_time',
+'receipt_call_time',
+'receipt_exit_time',
+'parking_duration',
+'parking_service',
+'municipality_service',
+'vat',
+'total_payment',
+'trip_id',
+'cargo_title',
+'receipt_code',
+'receipt_note',
+'senvar_footer_time'
+]
+.forEach(k =>
+set(k,a[k] ?? '')
+);
+
+
+[
+'received_at',
+'entered_terminal_at',
+'called_at',
+'exited_terminal_at',
+'allowed_customs_at'
+]
+.forEach(k =>
+set(k,inp(a[k]))
+);
+
+
+set(
+'receipt_entry_time',
+a.receipt_entry_time ||
+dt(a.received_at)
+);
+
+
+set(
+'receipt_call_time',
+a.receipt_call_time ||
+dt(a.called_at)
+);
+
+
+set(
+'receipt_exit_time',
+a.receipt_exit_time ||
+dt(a.exited_terminal_at)
+);
+
+
+showTemplateHint();
+
+
+document.getElementById(
+'formTitle'
+).textContent =
+'ویرایش نوبت';
+
+
+scrollTo({
+top:0,
+behavior:'smooth'
+});
+
+}
+
+
+/* ================= RESET ================= */
+
+function resetForm(){
+
+document
+.querySelectorAll(
+'#adminPage input,#adminPage textarea'
+)
+.forEach(x =>
+x.value=''
+);
+
+
+set(
+'receipt_template',
+'auto'
+);
+
+
+set(
+'municipality_service',
+'0'
+);
+
+
+document.getElementById(
+'editId'
+).value='';
+
+
+document.getElementById(
+'formTitle'
+).textContent =
+'ثبت نوبت جدید';
+
+
+hide('formMsg');
+
+showTemplateHint();
+
+}
+
+
+/* ================= NUMBER ================= */
+
+function num(id){
+
+let v =
+val(id)
+.replace(/,/g,'');
+
+
+return v === ''
+? null
+: Number(v);
+
+}
+
+
+/* ================= SAVE ================= */
 
 async function saveAppointment(){
 
-  if(!supabaseClient){
-
-    showMessage(
-      "اتصال به Supabase برقرار نیست.",
-      "err"
-    );
-
-    return;
-  }
+hide('formMsg');
 
 
-  const id =
-    document
-      .getElementById("editId")
-      .value
-      .trim();
+let serial =
+val('serial').trim();
 
 
-  const obj =
-    getFormObject();
+if(!serial){
 
+msg(
+'formMsg',
+'شماره نوبت را وارد کنید.',
+1
+);
 
-  if(!obj.serial){
-
-    showMessage(
-      "شماره نوبت را وارد کنید.",
-      "err"
-    );
-
-    return;
-  }
-
-
-  let result;
-
-
-  try{
-
-    if(id){
-
-      result =
-        await supabaseClient
-          .from("appointments")
-          .update(obj)
-          .eq("id",id);
-
-    }else{
-
-      result =
-        await supabaseClient
-          .from("appointments")
-          .insert(obj)
-          .select()
-          .single();
-
-    }
-
-
-    if(result.error){
-
-      showMessage(
-        "خطا: " +
-        result.error.message,
-        "err"
-      );
-
-      return;
-    }
-
-
-    showMessage(
-      id
-        ? "نوبت با موفقیت ویرایش شد."
-        : "نوبت با موفقیت ثبت شد."
-    );
-
-
-    clearForm();
-
-    await loadAppointments();
-
-
-  }catch(error){
-
-    showMessage(
-      "خطای غیرمنتظره: " +
-      error.message,
-      "err"
-    );
-
-  }
+return;
 
 }
 
 
-/* =====================================================
-   CLEAR
-===================================================== */
+let p = {
 
-function clearForm(){
+serial,
 
-  document
-    .getElementById("editId")
-    .value = "";
+border_name:
+val('border_name').trim() || null,
+
+queue_type:
+val('queue_type').trim() || null,
+
+plate_number:
+val('plate_number').trim() || null,
+
+appointment_type:
+val('appointment_type').trim() || null,
+
+received_at:
+iso('received_at'),
+
+status:
+val('status').trim() || null,
+
+terminal:
+val('terminal').trim() || null,
+
+service_number:
+val('service_number').trim() || null,
+
+entered_terminal_at:
+iso('entered_terminal_at'),
+
+called_at:
+iso('called_at'),
+
+exited_terminal_at:
+iso('exited_terminal_at'),
+
+allowed_customs_at:
+iso('allowed_customs_at'),
+
+parking_name:
+val('parking_name').trim() || null,
+
+receipt_template:
+val('receipt_template'),
+
+receipt_transit:
+val('receipt_transit').trim() || null,
+
+receipt_vehicle_type:
+val('receipt_vehicle_type').trim() || null,
+
+receipt_load_status:
+val('receipt_load_status').trim() || null,
+
+receipt_entry_time:
+val('receipt_entry_time').trim() || null,
+
+receipt_call_time:
+val('receipt_call_time').trim() || null,
+
+receipt_exit_time:
+val('receipt_exit_time').trim() || null,
+
+parking_duration:
+val('parking_duration').trim() || null,
+
+parking_service:
+num('parking_service'),
+
+municipality_service:
+num('municipality_service'),
+
+vat:
+num('vat'),
+
+total_payment:
+num('total_payment'),
+
+trip_id:
+val('trip_id').trim() || null,
+
+cargo_title:
+val('cargo_title').trim() || null,
+
+receipt_code:
+val('receipt_code').trim() || null,
+
+receipt_note:
+val('receipt_note') || null,
+
+senvar_footer_time:
+val('senvar_footer_time').trim() || null
+
+};
 
 
-  fields.forEach(function(id){
-
-    document
-      .getElementById(id)
-      .value = "";
-
-  });
+let id =
+val('editId');
 
 
-  document
-    .getElementById("formTitle")
-    .textContent =
-      "ثبت نوبت جدید";
+let b =
+document.getElementById(
+'saveBtn'
+);
+
+
+b.disabled = true;
+
+
+try{
+
+let r;
+
+
+if(id){
+
+r =
+await sb
+.from('appointments')
+.update(p)
+.eq('id',id);
+
+}
+else{
+
+r =
+await sb
+.from('appointments')
+.insert(p);
 
 }
 
 
-/* =====================================================
-   LOAD
-===================================================== */
-
-async function loadAppointments(){
-
-  if(!supabaseClient){
-
-    return;
-  }
+if(r.error)
+throw r.error;
 
 
-  try{
-
-    const result =
-      await supabaseClient
-        .from("appointments")
-        .select("*")
-        .order("id",{ascending:false})
-        .limit(500);
-
-
-    if(result.error){
-
-      showMessage(
-        "خطا در دریافت نوبت‌ها: " +
-        result.error.message,
-        "err"
-      );
-
-      return;
-    }
+msg(
+'formMsg',
+id
+?
+'ویرایش شد.'
+:
+'ثبت شد.'
+);
 
 
-    rows =
-      result.data || [];
+await load();
 
 
-    filterRows();
+if(!id)
+resetForm();
 
 
-  }catch(error){
+}
+catch(e){
 
-    showMessage(
-      "خطا در دریافت اطلاعات: " +
-      error.message,
-      "err"
-    );
+msg(
+'formMsg',
+'خطا در ذخیره: '+e.message,
+1
+);
 
-  }
+}
+finally{
+
+b.disabled=false;
+
+}
 
 }
 
 
-/* =====================================================
-   FILTER
-===================================================== */
+/* ================= DELETE ================= */
 
-function filterRows(){
+async function del(id){
 
-  const q =
-    document
-      .getElementById("search")
-      .value
-      .trim()
-      .toLowerCase();
+let a =
+rows.find(
+x => +x.id === +id
+);
 
 
-  const filtered =
-    rows.filter(function(r){
-
-      const text =
-        String(r.serial || "") +
-        " " +
-        String(r.plate_number || "");
-
-
-      return text
-        .toLowerCase()
-        .includes(q);
-
-    });
+if(
+!confirm(
+'حذف نوبت '+
+(a?.serial || id)+
+'؟'
+)
+)
+return;
 
 
-  render(filtered);
-
-}
-
-
-/* =====================================================
-   RENDER
-===================================================== */
-
-function render(list){
-
-  const body =
-    document.getElementById("tableBody");
+let {
+error
+} =
+await sb
+.from('appointments')
+.delete()
+.eq('id',id);
 
 
-  if(!list.length){
-
-    body.innerHTML = `
-
-      <tr>
-
-        <td
-          colspan="8"
-          style="text-align:center;padding:25px"
-        >
-          نوبتی پیدا نشد.
-        </td>
-
-      </tr>
-
-    `;
-
-    return;
-  }
+if(error)
+return alert(error.message);
 
 
-  body.innerHTML =
-    list.map(function(r){
-
-      const index =
-        rows.indexOf(r);
-
-
-      return `
-
-        <tr>
-
-          <td>
-            ${esc(r.serial)}
-          </td>
-
-          <td>
-            ${esc(r.plate_number)}
-          </td>
-
-          <td>
-
-            <span class="badge">
-
-              ${esc(r.status)}
-
-            </span>
-
-          </td>
-
-          <td>
-            ${esc(r.border_name)}
-          </td>
-
-          <td>
-            ${esc(r.queue_type)}
-          </td>
-
-          <td>
-            ${esc(r.received_at)}
-          </td>
-
-          <td>
-            ${esc(r.id)}
-          </td>
-
-          <td>
-
-            <div class="actions">
-
-              <button
-                class="qrbtn"
-                onclick="makeQRByIndex(${index})"
-              >
-                📱 QR اختصاصی
-              </button>
-
-              <button
-                class="secondary"
-                onclick="editByIndex(${index})"
-              >
-                ویرایش
-              </button>
-
-              <button
-                class="danger"
-                onclick="deleteByIndex(${index})"
-              >
-                حذف
-              </button>
-
-            </div>
-
-          </td>
-
-        </tr>
-
-      `;
-
-    }).join("");
+await load();
 
 }
 
 
-/* =====================================================
-   QR BY INDEX
-===================================================== */
+/* ================= RECEIPT DATA ================= */
 
-function makeQRByIndex(index){
+function data(a){
 
-  const row =
-    rows[index];
+return {
 
+id:a.id,
 
-  if(!row){
+serial:a.serial || '',
 
-    alert(
-      "نوبت پیدا نشد."
-    );
+template:
+templateFor(a),
 
-    return;
-  }
+parkingName:
+a.parking_name || '',
 
+transit:
+a.receipt_transit || '',
 
-  makeQR(row);
+entry:
+a.receipt_entry_time ||
+dt(a.received_at),
 
-}
+vehicle:
+a.receipt_vehicle_type || '',
 
+load:
+a.receipt_load_status || '',
 
-/* =====================================================
-   EDIT BY INDEX
-===================================================== */
+plate:
+a.plate_number || '',
 
-function editByIndex(index){
+call:
+a.receipt_call_time ||
+dt(a.called_at),
 
-  const row =
-    rows[index];
+exit:
+a.receipt_exit_time ||
+dt(a.exited_terminal_at),
 
+duration:
+a.parking_duration || '',
 
-  if(!row){
+parking:
+a.parking_service ?? '',
 
-    alert(
-      "نوبت پیدا نشد."
-    );
+municipality:
+a.municipality_service ?? 0,
 
-    return;
-  }
+vat:
+a.vat ?? '',
 
+total:
+a.total_payment ?? '',
 
-  editRow(row);
+trip:
+a.trip_id ||
+a.service_number ||
+'',
 
-}
+cargo:
+a.cargo_title ||
+'تانکر صادرات گاز',
 
+code:
+a.receipt_code ||
+a.serial ||
+'',
 
-/* =====================================================
-   DELETE BY INDEX
-===================================================== */
+note:
+a.receipt_note ||
+`راننده گرامی توجه داشته باشید
+انقضا قبض شما: [زمان انقضا]
+درصورت مراجعه بعد از زمان مذکور از پذیرش شما با این قبض معذور میباشیم`,
 
-function deleteByIndex(index){
+footer:
+a.senvar_footer_time ||
+''
 
-  const row =
-    rows[index];
-
-
-  if(!row){
-
-    alert(
-      "نوبت پیدا نشد."
-    );
-
-    return;
-  }
-
-
-  deleteRow(row.id);
-
-}
-
-
-/* =====================================================
-   EDIT ROW
-===================================================== */
-
-function editRow(row){
-
-  document
-    .getElementById("editId")
-    .value =
-      row.id || "";
-
-
-  fields.forEach(function(id){
-
-    document
-      .getElementById(id)
-      .value =
-        row[id] || "";
-
-  });
-
-
-  document
-    .getElementById("formTitle")
-    .textContent =
-      "ویرایش نوبت";
-
-
-  window.scrollTo({
-
-    top:0,
-
-    behavior:"smooth"
-
-  });
+};
 
 }
 
 
-/* =====================================================
-   DELETE
-===================================================== */
+/* ================= QR ================= */
 
-async function deleteRow(id){
+function makeQR(id,target){
 
-  if(!confirm(
-    "آیا از حذف این نوبت مطمئن هستید؟"
-  )){
-
-    return;
-  }
+target.innerHTML='';
 
 
-  try{
+new QRCode(
+target,
+{
 
-    const result =
-      await supabaseClient
-        .from("appointments")
-        .delete()
-        .eq("id",id);
+text:
+SITE+
+'?id='+
+encodeURIComponent(id),
 
+width:145,
 
-    if(result.error){
+height:145,
 
-      showMessage(
-        "خطا در حذف: " +
-        result.error.message,
-        "err"
-      );
+correctLevel:
+QRCode.CorrectLevel.H
 
-      return;
-    }
-
-
-    showMessage(
-      "نوبت با موفقیت حذف شد."
-    );
-
-
-    await loadAppointments();
-
-
-  }catch(error){
-
-    showMessage(
-      "خطا در حذف: " +
-      error.message,
-      "err"
-    );
-
-  }
+}
+);
 
 }
 
 
-/* =====================================================
-   ESCAPE
-===================================================== */
+/* ================= FILL RECEIPT ================= */
 
-function esc(value){
+function fill(d){
 
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
-}
+let bad =
+document.getElementById(
+'receiptBadpa'
+);
 
 
-/* =====================================================
-   QR اختصاصی
-===================================================== */
-
-function makeQR(row){
-
-  const serial =
-    String(row.serial || "").trim();
+let sen =
+document.getElementById(
+'receiptSenvar'
+);
 
 
-  const id =
-    String(row.id || "").trim();
+bad.classList.toggle(
+'hidden',
+d.template !== 'badpa'
+);
 
 
-  if(!serial){
-
-    alert(
-      "این نوبت شماره سریال ندارد."
-    );
-
-    return;
-  }
+sen.classList.toggle(
+'hidden',
+d.template !== 'senvar'
+);
 
 
-  if(!id){
+document.getElementById(
+'modalTitle'
+).textContent =
 
-    alert(
-      "شناسه یکتای این نوبت موجود نیست."
-    );
+d.template === 'senvar'
 
-    return;
-  }
+?
 
+'رسید سنوار حیات + QR'
 
-  /*
-   * مقصد QR سایت خودمان است.
-   *
-   * هر QR فقط ID اختصاصی همان نوبت
-   * را داخل آدرس قرار می‌دهد.
-   */
+:
 
-  const url =
-    "https://bordarpark1-ir.github.io/New1/" +
-    "?id=" +
-    encodeURIComponent(id);
+'رسید بادپا – ریمدان + QR';
 
 
-  currentQRSerial =
-    serial;
+/* ================= BADPA ================= */
+
+if(d.template === 'badpa'){
+
+document.getElementById(
+'bParking'
+).textContent =
+d.parkingName ||
+'بادپا – ریمدان';
 
 
-  currentQRId =
-    id;
+document.getElementById(
+'bTransit'
+).textContent =
+d.transit;
 
 
-  currentQRUrl =
-    url;
+document.getElementById(
+'bEntry'
+).textContent =
+d.entry;
 
 
-  const modal =
-    document.getElementById("qrModal");
+document.getElementById(
+'bVehicle'
+).textContent =
+d.vehicle;
 
 
-  modal.classList.remove("hidden");
+document.getElementById(
+'bLoad'
+).textContent =
+d.load;
 
 
-  const qrBox =
-    document.getElementById("qrcode");
+document.getElementById(
+'bPlate'
+).textContent =
+d.plate;
 
 
-  qrBox.innerHTML =
-    "";
+document.getElementById(
+'bCall'
+).textContent =
+d.call;
 
 
-  document
-    .getElementById("qrSerial")
-    .textContent =
-      "شماره نوبت: " +
-      serial;
+document.getElementById(
+'bExit'
+).textContent =
+d.exit;
 
 
-  document
-    .getElementById("qrId")
-    .textContent =
-      "شناسه اختصاصی: " +
-      id;
+document.getElementById(
+'bDuration'
+).textContent =
+d.duration;
 
 
-  document
-    .getElementById("qrUrl")
-    .textContent =
-      url;
+document.getElementById(
+'bParkingMoney'
+).textContent =
+money(d.parking);
 
 
-  try{
-
-    new QRCode(
-
-      qrBox,
-
-      {
-
-        text:url,
-
-        width:240,
-
-        height:240,
-
-        correctLevel:
-          QRCode.CorrectLevel.H
-
-      }
-
-    );
-
-  }catch(error){
-
-    qrBox.innerHTML =
-      "<div style='color:red'>خطا در ساخت QR</div>";
-
-    console.error(error);
-
-  }
-
-}
+document.getElementById(
+'bMunicipality'
+).textContent =
+money(d.municipality);
 
 
-/* =====================================================
-   CLOSE QR
-===================================================== */
+document.getElementById(
+'bVat'
+).textContent =
+money(d.vat);
 
-function closeQR(){
 
-  document
-    .getElementById("qrModal")
-    .classList
-    .add("hidden");
+document.getElementById(
+'bTotal'
+).textContent =
+money(d.total);
+
+
+document.getElementById(
+'bCargo'
+).textContent =
+d.cargo;
+
+
+document.getElementById(
+'bNote'
+).textContent =
+d.note;
+
+
+document.getElementById(
+'bCode'
+).textContent =
+d.code;
+
+
+makeQR(
+d.id,
+document.getElementById(
+'qrBadpa'
+)
+);
 
 }
 
 
-/* =====================================================
-   DOWNLOAD QR
-===================================================== */
+/* ================= SENVAR ================= */
 
-function downloadQR(){
+else{
 
-  const box =
-    document.getElementById("qrcode");
+document.getElementById(
+'sParking'
+).textContent =
 
+(d.parkingName ||
+'سنوار حیات – ریمدان')
 
-  const canvas =
-    box.querySelector("canvas");
++
 
-
-  const img =
-    box.querySelector("img");
-
-
-  let dataURL =
-    "";
-
-
-  if(canvas){
-
-    dataURL =
-      canvas.toDataURL("image/png");
-
-  }else if(img){
-
-    dataURL =
-      img.src;
-
-  }else{
-
-    alert(
-      "QR هنوز آماده نشده است."
-    );
-
-    return;
-  }
+(
+d.trip
+?
+' - - ' + d.trip
+:
+''
+);
 
 
-  const a =
-    document.createElement("a");
+document.getElementById(
+'sPlate'
+).textContent =
+d.plate;
 
 
-  a.href =
-    dataURL;
+document.getElementById(
+'sVehicle'
+).textContent =
+d.vehicle;
 
 
-  a.download =
-    "QR-" +
-    currentQRSerial +
-    "-" +
-    currentQRId +
-    ".png";
+document.getElementById(
+'sLoad'
+).textContent =
+d.load;
 
 
-  document
-    .body
-    .appendChild(a);
+document.getElementById(
+'sReceive'
+).textContent =
+d.entry;
 
 
-  a.click();
+document.getElementById(
+'sAppointment'
+).textContent =
+'گاز   صادرات   تانکر';
 
 
-  a.remove();
+document.getElementById(
+'sTitle'
+).textContent =
+
+(d.parkingName ||
+'سنوار حیات')
++
+' - ریمدان';
+
+
+document.getElementById(
+'sEntry'
+).textContent =
+d.entry;
+
+
+document.getElementById(
+'sCall'
+).textContent =
+d.call;
+
+
+document.getElementById(
+'sExit'
+).textContent =
+d.exit;
+
+
+document.getElementById(
+'sParkingMoney'
+).textContent =
+money(d.parking);
+
+
+document.getElementById(
+'sMunicipality'
+).textContent =
+money(d.municipality);
+
+
+document.getElementById(
+'sVat'
+).textContent =
+money(d.vat);
+
+
+document.getElementById(
+'sTotal'
+).textContent =
+money(d.total);
+
+
+document.getElementById(
+'sTrip'
+).textContent =
+d.trip;
+
+
+document.getElementById(
+'sFooter'
+).textContent =
+d.footer;
+
+
+makeQR(
+d.id,
+document.getElementById(
+'qrSenvar'
+)
+);
+
+}
 
 }
 
 
-/* =====================================================
-   PRINT QR
-===================================================== */
+/* ================= RECEIPT ================= */
 
-function printQR(){
+function receipt(id){
 
-  const box =
-    document.getElementById("qrcode");
+let a =
+rows.find(
+x => +x.id === +id
+);
 
 
-  const canvas =
-    box.querySelector("canvas");
+if(!a)
+return;
 
 
-  const img =
-    box.querySelector("img");
+fill(
+data(a)
+);
 
 
-  let image =
-    "";
-
-
-  if(canvas){
-
-    image =
-      canvas.toDataURL("image/png");
-
-  }else if(img){
-
-    image =
-      img.src;
-
-  }else{
-
-    alert(
-      "QR آماده نیست."
-    );
-
-    return;
-  }
-
-
-  const serial =
-    currentQRSerial;
-
-
-  const id =
-    currentQRId;
-
-
-  const w =
-    window.open(
-      "",
-      "_blank",
-      "width=500,height=700"
-    );
-
-
-  if(!w){
-
-    alert(
-      "پنجره چاپ توسط مرورگر مسدود شده است."
-    );
-
-    return;
-  }
-
-
-  w.document.write(`
-
-    <!DOCTYPE html>
-
-    <html lang="fa" dir="rtl">
-
-    <head>
-
-      <meta charset="UTF-8">
-
-      <title>
-        QR نوبت ${esc(serial)}
-      </title>
-
-      <style>
-
-        body{
-
-          text-align:center;
-
-          font-family:
-            Tahoma,Arial,sans-serif;
-
-          padding:40px;
-
-        }
-
-        img{
-
-          width:240px;
-
-          height:240px;
-
-          margin:25px;
-
-        }
-
-        h2{
-
-          margin-bottom:10px;
-
-        }
-
-        .id{
-
-          color:#666;
-
-          font-size:13px;
-
-        }
-
-      </style>
-
-    </head>
-
-    <body>
-
-      <h2>QR نوبت</h2>
-
-      <img src="${image}">
-
-      <h3>
-
-        شماره نوبت:
-        ${esc(serial)}
-
-      </h3>
-
-      <div class="id">
-
-        شناسه اختصاصی:
-        ${esc(id)}
-
-      </div>
-
-      <script>
-
-        window.onload = function(){
-
-          setTimeout(function(){
-
-            window.print();
-
-          },500);
-
-        };
-
-      <\/script>
-
-    </body>
-
-    </html>
-
-  `);
-
-
-  w.document.close();
+document.getElementById(
+'modal'
+).classList.add('show');
 
 }
 
 
-/* =====================================================
-   START
-===================================================== */
+/* ================= PREVIEW ================= */
 
-window.addEventListener(
-  "load",
-  async function(){
+function preview(){
 
-    const ready =
-      initializeSupabase();
+let id =
+val('editId');
 
 
-    if(ready){
+if(!id){
 
-      await checkSession();
+return msg(
+'formMsg',
+'ابتدا نوبت را ذخیره کنید تا QR اختصاصی ساخته شود.',
+1
+);
 
-    }
+}
 
-  }
+
+let a =
+rows.find(
+x => +x.id === +id
+);
+
+
+if(a)
+receipt(id);
+
+}
+
+
+/* ================= MODAL ================= */
+
+function closeReceipt(){
+
+document.getElementById(
+'modal'
+).classList.remove('show');
+
+}
+
+
+function printReceipt(){
+
+print();
+
+}
+
+
+/* ================= PUBLIC PAGE ================= */
+
+function publicPage(id){
+
+open(
+SITE+
+'?id='+
+encodeURIComponent(id),
+'_blank'
+);
+
+}
+
+
+/* ================= KEYBOARD ================= */
+
+addEventListener(
+'keydown',
+e => {
+
+if(e.key === 'Escape')
+closeReceipt();
+
+
+if(
+e.key === 'Enter' &&
+document.activeElement.id === 'password'
+)
+login();
+
+}
+);
+
+
+/* ================= START ================= */
+
+addEventListener(
+'load',
+() => {
+
+if(init()){
+
+showTemplateHint();
+
+session();
+
+}
+
+}
 );
 
 </script>
