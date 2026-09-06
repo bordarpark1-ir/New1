@@ -1,319 +1,82 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>استعلام نوبت خودرو</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 
 <style>
-*{box-sizing:border-box}
+html,body{
+  margin:0;
+  padding:0;
+  background:#fff;
+  color:#111;
+  font-family:Tahoma,"Segoe UI",Arial,sans-serif;
+}
 
 body{
-  margin:0;
-  background:#f3f4f6;
-  color:#202124;
-  font-family:Tahoma,Arial,sans-serif
+  min-height:100vh;
 }
 
-.wrap{
-  max-width:720px;
-  margin:auto;
-  padding:18px
-}
-
-.header{
-  text-align:center;
-  padding:22px 8px 14px
-}
-
-.header h1{
-  margin:0;
-  font-size:27px;
-  font-weight:800
-}
-
-.header p{
-  margin:8px 0 0;
-  color:#666;
-  font-size:14px
-}
-
-.card{
-  background:#fff;
-  border:1px solid #ddd;
-  border-radius:14px;
-  box-shadow:0 3px 14px #0000000d
-}
-
-.search{
-  padding:16px;
-  margin-top:8px
-}
-
-.search-title{
-  font-size:15px;
-  font-weight:bold;
-  margin-bottom:10px
-}
-
-.search-row{
-  display:flex;
-  gap:8px
-}
-
-.search-row input{
-  flex:1;
-  min-width:0;
-  height:48px;
-  border:1px solid #bbb;
-  border-radius:9px;
-  padding:0 14px;
-  font-size:16px;
-  text-align:right;
-  outline:none
-}
-
-.search-row input:focus{
-  border-color:#555
-}
-
-button{
-  border:0;
-  border-radius:9px;
-  padding:0 18px;
-  height:48px;
-  font-family:inherit;
-  font-size:14px;
-  cursor:pointer
-}
-
-.btn{
-  background:#222;
-  color:white
-}
-
-.btn:disabled{
-  opacity:.6
+.page{
+  width:100%;
+  max-width:760px;
+  margin:0 auto;
+  padding:18px 14px 30px;
+  box-sizing:border-box;
 }
 
 .msg{
-  margin-top:10px;
-  padding:11px;
-  border-radius:8px;
-  background:#f5f5f5;
-  display:none;
+  text-align:center;
+  margin-top:35vh;
+  font-size:15px;
+  line-height:2;
+}
+
+.box{
   font-size:13px;
-  line-height:1.8
+  line-height:2.15;
+  text-align:right;
 }
 
-.result{
-  margin-top:14px;
-  overflow:hidden
-}
-
-.result-head{
-  padding:14px 16px;
-  border-bottom:1px solid #ddd;
-  font-weight:800;
+.title{
   text-align:center;
-  font-size:17px
+  font-weight:700;
+  font-size:20px;
+  margin:4px 0 14px;
 }
 
-.status{
-  padding:12px;
-  text-align:center;
-  font-weight:bold;
-  border-bottom:1px solid #eee
-}
-
-.status.ok{
-  background:#f0f8f1;
-  color:#24652b
-}
-
-.status.wait{
-  background:#fff8e8;
-  color:#765500
-}
-
-.info{
-  display:grid;
-  grid-template-columns:1fr 1fr
-}
-
-.item{
-  min-height:58px;
-  padding:10px 13px;
-  border-bottom:1px solid #eee;
+.row{
   display:flex;
-  flex-direction:column;
-  justify-content:center
+  justify-content:space-between;
+  gap:18px;
+  white-space:pre-wrap;
 }
 
-.item:nth-child(odd){
-  border-left:1px solid #eee
+.row b{
+  font-weight:700;
 }
 
-.label{
-  font-size:11px;
-  color:#777;
-  margin-bottom:5px
-}
-
-.value{
-  font-size:14px;
-  font-weight:600;
-  word-break:break-word
-}
-
-.empty{
-  padding:35px 15px;
-  text-align:center;
-  color:#777
-}
-
-.footer{
-  text-align:center;
-  color:#888;
-  font-size:11px;
-  padding:20px 0
+.rule{
+  border-bottom:1px solid #111;
+  margin:5px 0;
 }
 
 .hidden{
-  display:none!important
+  display:none!important;
 }
 
-.receipt-switch{
-  display:flex;
-  gap:8px;
-  padding:12px;
-  border-bottom:1px solid #eee
-}
-
-.receipt-switch button{
-  height:40px;
-  flex:1;
-  background:#eee;
-  color:#333
-}
-
-.receipt-switch button.active{
-  background:#222;
-  color:#fff
-}
-
-.receipt{
-  margin:14px;
-  background:white;
-  border:1px solid #bbb;
-  padding:14px;
-  font-family:Tahoma,Arial,sans-serif
-}
-
-.r-title{
-  text-align:center;
-  font-size:18px;
-  font-weight:900;
-  margin-bottom:5px
-}
-
-.r-sub{
-  text-align:center;
-  font-size:12px;
-  margin-bottom:12px
-}
-
-.r-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  border:1px solid #777
-}
-
-.r-cell{
-  padding:8px;
-  border-bottom:1px solid #777;
-  font-size:12px
-}
-
-.r-cell:nth-child(odd){
-  border-left:1px solid #777
-}
-
-.r-money{
-  margin-top:12px;
-  border:1px solid #777
-}
-
-.r-money div{
-  display:flex;
-  justify-content:space-between;
-  padding:7px 9px;
-  border-bottom:1px solid #777;
-  font-size:12px
-}
-
-.r-money div:last-child{
-  border-bottom:0;
-  font-weight:900
-}
-
-.r-cargo{
-  text-align:center;
-  font-weight:bold;
-  margin:13px 0
-}
-
-.r-note{
-  text-align:center;
-  font-size:11px;
-  line-height:2;
-  border-top:1px dashed #888;
-  padding-top:10px
-}
-
-.r-code{
-  text-align:center;
-  font-family:monospace;
-  font-size:13px;
-  margin-top:12px
-}
-
-@media(max-width:520px){
-
-  .wrap{
-    padding:10px
+@media print{
+  .page{
+    max-width:none;
+    padding:0;
   }
 
-  .header h1{
-    font-size:23px
-  }
-
-  .search-row{
-    flex-direction:column
-  }
-
-  .search-row button{
-    width:100%
-  }
-
-  .info{
-    grid-template-columns:1fr
-  }
-
-  .item:nth-child(odd){
-    border-left:0
-  }
-
-  .item{
-    border-bottom:1px solid #eee
-  }
-
-  .receipt{
-    margin:8px;
-    padding:10px
+  .msg{
+    display:none;
   }
 }
 </style>
@@ -321,949 +84,85 @@ button{
 
 <body>
 
-<div class="wrap">
+<main class="page">
 
-<header class="header">
-  <h1>استعلام نوبت</h1>
-  <p>سامانه استعلام وضعیت نوبت خودرو</p>
-</header>
-
-<section class="card search">
-
-  <div class="search-title">
-    شماره نوبت / سریال را وارد کنید
+  <div id="loading" class="msg">
+    در حال دریافت اطلاعات…
   </div>
 
-  <div class="search-row">
+  <div id="error" class="msg hidden"></div>
 
-    <input
-      id="serialInput"
-      type="text"
-      placeholder="مثلاً FN050501269"
-      autocomplete="off"
-    >
+  <section id="content" class="box hidden"></section>
 
-    <button
-      id="searchBtn"
-      class="btn"
-      onclick="searchAppointment()"
-    >
-      استعلام
-    </button>
-
-  </div>
-
-  <div id="msg" class="msg"></div>
-
-</section>
-
-<section id="result" class="card result hidden">
-
-  <div class="result-head">
-    وضعیت نوبت خودرو
-  </div>
-
-  <div id="statusBox" class="status"></div>
-
-  <div id="info" class="info"></div>
-
-  <div id="receiptArea"></div>
-
-</section>
-
-<div class="footer">
-  سامانه استعلام وضعیت نوبت خودرو
-</div>
-
-</div>
-
+</main>
 
 <script>
 
-let supabaseClient = null;
-
-
-function initSupabase(){
-
-  if(supabaseClient)
-    return true;
-
-  if(!window.supabase){
-
-    showMsg(
-      'کتابخانه سامانه بارگذاری نشده است.',
-      true
-    );
-
-    return false;
-  }
-
-  if(
-    !window.SUPABASE_URL ||
-    !window.SUPABASE_ANON_KEY
-  ){
-
-    showMsg(
-      'تنظیمات اتصال به پایگاه داده پیدا نشد.',
-      true
-    );
-
-    return false;
-  }
-
-  try{
-
-    supabaseClient =
-      window.supabase.createClient(
-        window.SUPABASE_URL,
-        window.SUPABASE_ANON_KEY
-      );
-
-    return true;
-
-  }catch(e){
-
-    showMsg(
-      'خطا در راه‌اندازی سامانه: ' + e.message,
-      true
-    );
-
-    return false;
-  }
-}
-
-
-function showMsg(text,error=false){
-
-  const m =
-    document.getElementById('msg');
-
-  m.style.display='block';
-
-  m.style.background =
-    error ? '#fff0f0' : '#f5f5f5';
-
-  m.style.color =
-    error ? '#9b2226' : '#555';
-
-  m.textContent=text;
-}
-
-
-function hideMsg(){
-
-  document.getElementById('msg')
-    .style.display='none';
-}
-
+let sb;
 
 function esc(v){
-
-  return String(v ?? '')
-    .replace(
-      /[&<>"']/g,
-      s => ({
-        '&':'&amp;',
-        '<':'&lt;',
-        '>':'&gt;',
-        '"':'&quot;',
-        "'":'&#039;'
-      }[s])
-    );
+  return String(v ?? '').replace(/[&<>"']/g,s=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#039;'
+  }[s]));
 }
 
-
-function val(v){
-
-  return (
-    v === null ||
-    v === undefined ||
-    v === ''
-  )
-  ? '—'
-  : esc(v);
+function showError(t){
+  document.getElementById('loading').classList.add('hidden');
+  const error=document.getElementById('error');
+  error.textContent=t;
+  error.classList.remove('hidden');
 }
 
-
-function money(v){
-
-  if(
-    v === null ||
-    v === undefined ||
-    v === ''
-  )
-    return '—';
-
-  const n=Number(v);
-
-  return Number.isFinite(n)
-    ? n.toLocaleString('fa-IR')+' ریال'
-    : esc(v);
+function f(v){
+  return v===null || v===undefined || v==='' ? '' : esc(v);
 }
 
+function date(v){
 
-function fmtDate(v){
-
-  if(!v)
-    return '—';
+  if(!v) return '';
 
   try{
 
-    return new Date(v)
-      .toLocaleString(
-        'fa-IR',
-        {
-          year:'numeric',
-          month:'2-digit',
-          day:'2-digit',
-          hour:'2-digit',
-          minute:'2-digit'
-        }
-      );
+    return new Date(v).toLocaleString('fa-IR',{
+      year:'numeric',
+      month:'2-digit',
+      day:'2-digit',
+      hour:'2-digit',
+      minute:'2-digit'
+    });
 
   }catch(e){
 
     return esc(v);
-  }
-}
-
-
-function templateFor(a){
-
-  const t =
-    a.receipt_template || 'auto';
-
-  if(
-    t === 'badpa' ||
-    t === 'senvar'
-  )
-    return t;
-
-  const n =
-    String(
-      a.parking_name || ''
-    ).toLowerCase();
-
-  return (
-    n.includes('سنوار') ||
-    n.includes('senvar')
-  )
-  ? 'senvar'
-  : 'badpa';
-}
-
-
-function row(label,value){
-
-  return `
-    <div class="item">
-
-      <div class="label">
-        ${label}
-      </div>
-
-      <div class="value">
-        ${val(value)}
-      </div>
-
-    </div>
-  `;
-}
-
-
-function renderAppointment(a){
-
-  document
-    .getElementById('result')
-    .classList
-    .remove('hidden');
-
-
-  const status =
-    String(a.status || '').trim();
-
-
-  const sb =
-    document.getElementById('statusBox');
-
-
-  sb.textContent =
-    status || 'وضعیت نوبت';
-
-
-  sb.className =
-    'status ' +
-    (
-      status.includes('تکمیل') ||
-      status.includes('خروج')
-      ? 'ok'
-      : 'wait'
-    );
-
-
-  document.getElementById('info')
-    .innerHTML =
-
-      row(
-        'شماره نوبت / سریال',
-        a.serial
-      )
-
-      +
-
-      row(
-        'نام مرز',
-        a.border_name
-      )
-
-      +
-
-      row(
-        'نوع صف',
-        a.queue_type
-      )
-
-      +
-
-      row(
-        'پلاک',
-        a.plate_number
-      )
-
-      +
-
-      row(
-        'نوع نوبت',
-        a.appointment_type
-      )
-
-      +
-
-      row(
-        'زمان دریافت',
-        fmtDate(a.received_at)
-      )
-
-      +
-
-      row(
-        'وضعیت',
-        a.status
-      )
-
-      +
-
-      row(
-        'ترمینال',
-        a.terminal
-      )
-
-      +
-
-      row(
-        'شماره خدمت',
-        a.service_number
-      )
-
-      +
-
-      row(
-        'ورود به ترمینال',
-        fmtDate(a.entered_terminal_at)
-      )
-
-      +
-
-      row(
-        'فراخوان',
-        fmtDate(a.called_at)
-      )
-
-      +
-
-      row(
-        'خروج از ترمینال',
-        fmtDate(a.exited_terminal_at)
-      )
-
-      +
-
-      row(
-        'مجاز گمرک',
-        fmtDate(a.allowed_customs_at)
-      )
-
-      +
-
-      row(
-        'پارکینگ / مجموعه',
-        a.parking_name
-      );
-
-
-  renderReceipt(a);
-}
-
-
-function renderReceipt(a){
-
-  const area =
-    document.getElementById(
-      'receiptArea'
-    );
-
-
-  const t =
-    templateFor(a);
-
-
-  const cargo =
-    a.cargo_title ||
-    'تانکر صادرات گاز';
-
-
-  const code =
-    a.receipt_code ||
-    a.serial ||
-    '';
-
-
-  const transit =
-    a.receipt_transit || '';
-
-
-  const vehicle =
-    a.receipt_vehicle_type || '';
-
-
-  const load =
-    a.receipt_load_status || '';
-
-
-  const entry =
-    a.receipt_entry_time ||
-    fmtDate(a.entered_terminal_at) ||
-    '';
-
-
-  const call =
-    a.receipt_call_time ||
-    fmtDate(a.called_at) ||
-    '';
-
-
-  const exit =
-    a.receipt_exit_time ||
-    fmtDate(a.exited_terminal_at) ||
-    '';
-
-
-  const duration =
-    a.parking_duration || '';
-
-
-  const parking =
-    a.parking_service;
-
-
-  const municipality =
-    a.municipality_service;
-
-
-  const vat =
-    a.vat;
-
-
-  const total =
-    a.total_payment;
-
-
-  const note =
-    a.receipt_note ||
-    `راننده گرامی توجه داشته باشید
-انقضا قبض شما: [زمان انقضا]
-درصورت مراجعه بعد از زمان مذکور از پذیرش شما با این قبض معذور میباشیم`;
-
-
-  /* =========================
-     قالب بادپا
-     ========================= */
-
-  if(t === 'badpa'){
-
-    area.innerHTML = `
-
-      <div class="receipt-switch">
-
-        <button class="active">
-          رسید بادپا – ریمدان
-        </button>
-
-      </div>
-
-
-      <div class="receipt">
-
-        <div class="r-title">
-          ${val(
-            a.parking_name ||
-            'بادپا – ریمدان'
-          )}
-        </div>
-
-
-        <div class="r-sub">
-          ترانزیت ${val(transit)}
-        </div>
-
-
-        <div class="r-grid">
-
-          <div class="r-cell">
-            زمان ورود: ${val(entry)}
-          </div>
-
-          <div class="r-cell">
-            نوع ناوگان: ${val(vehicle)}
-          </div>
-
-          <div class="r-cell">
-            وضعیت: ${val(load)}
-          </div>
-
-          <div class="r-cell">
-            پلاک: ${val(a.plate_number)}
-          </div>
-
-          <div class="r-cell">
-            فراخوان: ${val(call)}
-          </div>
-
-          <div class="r-cell">
-            زمان خروج: ${val(exit)}
-          </div>
-
-          <div class="r-cell">
-            مدت پارک: ${val(duration)}
-          </div>
-
-          <div class="r-cell"></div>
-
-        </div>
-
-
-        <div class="r-money">
-
-          <div>
-            <span>خدمات پارکینگ</span>
-            <span>${money(parking)}</span>
-          </div>
-
-          <div>
-            <span>تاخیر در خروج</span>
-            <span>۰</span>
-          </div>
-
-          <div>
-            <span>خدمات شهرداری</span>
-            <span>${money(municipality)}</span>
-          </div>
-
-          <div>
-            <span>مالیات ارزش افزوده</span>
-            <span>${money(vat)}</span>
-          </div>
-
-          <div>
-            <span>جمع پرداختی</span>
-            <span>${money(total)}</span>
-          </div>
-
-        </div>
-
-
-        <div class="r-cargo">
-          ${val(cargo)}
-        </div>
-
-
-        <div class="r-note">
-
-          ${esc(note).replace(
-            /\n/g,
-            '<br>'
-          )}
-
-        </div>
-
-
-        <div class="r-code">
-          ${val(code)}
-        </div>
-
-      </div>
-    `;
 
   }
 
-  /* =========================
-     قالب سنوار
-     ========================= */
-
-  else{
-
-    area.innerHTML = `
-
-      <div class="receipt-switch">
-
-        <button class="active">
-          رسید سنوار حیات – ریمدان
-        </button>
-
-      </div>
-
-
-      <div class="receipt">
-
-        <div class="r-title">
-
-          ${val(
-            (a.parking_name ||
-            'سنوار حیات') +
-
-            (
-              a.trip_id
-              ? ' - - ' + a.trip_id
-              : ''
-            )
-          )}
-
-        </div>
-
-
-        <div class="r-sub">
-
-          پلاک
-          ${val(a.plate_number)}
-
-        </div>
-
-
-        <div class="r-grid">
-
-          <div class="r-cell">
-
-            نوع ناوگان:
-            ${val(vehicle)}
-
-          </div>
-
-          <div class="r-cell">
-
-            ${val(load)}
-
-          </div>
-
-          <div class="r-cell">
-
-            دریافت نوبت:
-            ${val(entry)}
-
-          </div>
-
-          <div class="r-cell">
-
-            شناسه سفر:
-            ${val(a.trip_id)}
-
-          </div>
-
-        </div>
-
-
-        <div class="r-cargo">
-
-          گاز
-          &nbsp;&nbsp;
-          صادرات
-          &nbsp;&nbsp;
-          تانکر
-
-        </div>
-
-
-        <div
-          class="r-title"
-          style="font-size:15px"
-        >
-
-          ${val(
-            a.parking_name ||
-            'سنوار حیات - ریمدان'
-          )}
-
-        </div>
-
-
-        <div class="r-grid">
-
-          <div class="r-cell">
-
-            زمان ورود:
-            ${val(entry)}
-
-          </div>
-
-          <div class="r-cell">
-
-            فراخوان:
-            ${val(call)}
-
-          </div>
-
-          <div class="r-cell">
-
-            زمان خروج:
-            ${val(exit)}
-
-          </div>
-
-          <div class="r-cell">
-
-            شناسه سفر سامانه جامع حمل و نقل:
-            ${val(a.trip_id)}
-
-          </div>
-
-        </div>
-
-
-        <div class="r-money">
-
-          <div>
-            <span>خدمات پارکینگ</span>
-            <span>${money(parking)}</span>
-          </div>
-
-          <div>
-            <span>تاخیر در خروج</span>
-            <span>۰</span>
-          </div>
-
-          <div>
-            <span>خدمات شهرداری</span>
-            <span>${money(municipality)}</span>
-          </div>
-
-          <div>
-            <span>مالیات ارزش افزوده</span>
-            <span>${money(vat)}</span>
-          </div>
-
-          <div>
-            <span>جمع پرداختی</span>
-            <span>${money(total)}</span>
-          </div>
-
-        </div>
-
-
-        <div class="r-code">
-
-          ${val(code)}
-
-        </div>
-
-      </div>
-    `;
-  }
 }
 
-
-async function searchAppointment(){
-
-  hideMsg();
-
-
-  if(!initSupabase())
-    return;
-
-
-  const input =
-    document.getElementById(
-      'serialInput'
-    );
-
-
-  const btn =
-    document.getElementById(
-      'searchBtn'
-    );
-
-
-  const q =
-    input.value.trim();
-
-
-  if(!q){
-
-    showMsg(
-      'شماره نوبت یا سریال را وارد کنید.',
-      true
-    );
-
-    input.focus();
-
-    return;
-  }
-
-
-  btn.disabled=true;
-
-  btn.textContent =
-    'در حال بررسی...';
-
-
-  document
-    .getElementById('result')
-    .classList
-    .add('hidden');
-
+async function run(){
 
   try{
 
-    let query =
-      supabaseClient
-        .from('appointments')
-        .select('*')
-        .limit(1);
+    if(
+      !window.supabase ||
+      !window.SUPABASE_URL ||
+      !window.SUPABASE_ANON_KEY
+    ){
 
-
-    if(/^\d+$/.test(q)){
-
-      query =
-        query.eq(
-          'id',
-          Number(q)
-        );
-
-    }else{
-
-      query =
-        query.eq(
-          'serial',
-          q
-        );
-    }
-
-
-    const {
-      data,
-      error
-    } =
-      await query.maybeSingle();
-
-
-    if(error)
-      throw error;
-
-
-    if(!data){
-
-      showMsg(
-        'نوبتی با این شماره پیدا نشد.',
-        true
-      );
-
+      showError('اتصال سامانه برقرار نشد.');
       return;
-    }
-
-
-    renderAppointment(data);
-
-
-  }catch(e){
-
-    console.error(e);
-
-    showMsg(
-      'خطا در دریافت اطلاعات: ' +
-      (e.message || e),
-      true
-    );
-
-
-  }finally{
-
-    btn.disabled=false;
-
-    btn.textContent='استعلام';
-  }
-}
-
-
-function autoSearch(){
-
-  const p =
-    new URLSearchParams(
-      location.search
-    );
-
-
-  const id =
-    p.get('id');
-
-
-  const serial =
-    p.get('serial');
-
-
-  if(id){
-
-    document
-      .getElementById(
-        'serialInput'
-      )
-      .value=id;
-
-    searchAppointment();
-
-  }
-
-  else if(serial){
-
-    document
-      .getElementById(
-        'serialInput'
-      )
-      .value=serial;
-
-    searchAppointment();
-  }
-}
-
-
-document
-  .getElementById(
-    'serialInput'
-  )
-  .addEventListener(
-    'keydown',
-    e => {
-
-      if(e.key === 'Enter')
-        searchAppointment();
 
     }
-  );
 
+    sb=window.supabase.createClient(
+      window.SUPABASE_URL,
+      window.SUPABASE_ANON_KEY
+    );
 
-window.addEventListener(
-  'load',
-  autoSearch
-);
-
-</script>
-
-</body>
-</html>
+    /*
+      صفحه عمومی فقط با QR اختصاصی باز می‌شود.
+     
