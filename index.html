@@ -10,9 +10,7 @@
   <script src="config.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -316,46 +314,80 @@
 
   </div>
 
-
   <script>
 
-    // اتصال به Supabase
     const supabaseClient = window.supabase.createClient(
       window.SUPABASE_URL,
       window.SUPABASE_ANON_KEY
     );
 
-
     function hideMessages() {
+
       document.getElementById("loading").style.display = "none";
+
       document.getElementById("error").style.display = "none";
+
       document.getElementById("result").style.display = "none";
+
     }
 
 
     function showValue(id, value) {
-      document.getElementById(id).textContent =
-        value === null || value === undefined || value === ""
-          ? "-"
-          : value;
+
+      const element = document.getElementById(id);
+
+      if (
+        value === null ||
+        value === undefined ||
+        value === ""
+      ) {
+        element.textContent = "-";
+      } else {
+        element.textContent = value;
+      }
+
     }
 
 
     function showResult(data) {
 
       showValue("r_serial", data.serial);
+
       showValue("r_border", data.border_name);
+
       showValue("r_queue", data.queue_type);
+
       showValue("r_plate", data.plate_number);
+
       showValue("r_type", data.appointment_type);
+
       showValue("r_received", data.received_at);
+
       showValue("r_status", data.status);
+
       showValue("r_terminal", data.terminal);
+
       showValue("r_service", data.service_number);
-      showValue("r_entered", data.entered_terminal_at);
-      showValue("r_called", data.called_at);
-      showValue("r_exited", data.exited_terminal_at);
-      showValue("r_customs", data.allowed_customs_at);
+
+      showValue(
+        "r_entered",
+        data.entered_terminal_at
+      );
+
+      showValue(
+        "r_called",
+        data.called_at
+      );
+
+      showValue(
+        "r_exited",
+        data.exited_terminal_at
+      );
+
+      showValue(
+        "r_customs",
+        data.allowed_customs_at
+      );
 
       document.getElementById("result").style.display = "block";
     }
@@ -365,33 +397,48 @@
 
       hideMessages();
 
-      const input = document.getElementById("serial");
+      const input =
+        document.getElementById("serial");
 
-      const serial = input.value.trim();
+      const serial =
+        input.value.trim();
+
 
       if (!serial) {
+
         document.getElementById("error").textContent =
           "لطفاً شماره سریال نوبت را وارد کنید.";
 
-        document.getElementById("error").style.display = "block";
+        document.getElementById("error").style.display =
+          "block";
 
         return;
       }
 
 
-      document.getElementById("loading").style.display = "block";
+      document.getElementById("loading").style.display =
+        "block";
 
 
       try {
 
-        const { data, error } = await supabaseClient
-          .from("appointments")
-          .select("*")
-          .eq("serial", serial)
-          .maybeSingle();
+        /*
+          فقط همین سریال جستجو می‌شود.
+          بنابراین هر نوبت اطلاعات مخصوص خودش
+          را نمایش می‌دهد.
+        */
+
+        const { data, error } =
+          await supabaseClient
+            .from("appointments")
+            .select("*")
+            .eq("serial", serial)
+            .limit(1)
+            .maybeSingle();
 
 
-        document.getElementById("loading").style.display = "none";
+        document.getElementById("loading").style.display =
+          "none";
 
 
         if (error) {
@@ -401,7 +448,8 @@
           document.getElementById("error").textContent =
             "خطا در اتصال به سامانه. دوباره تلاش کنید.";
 
-          document.getElementById("error").style.display = "block";
+          document.getElementById("error").style.display =
+            "block";
 
           return;
         }
@@ -412,50 +460,84 @@
           document.getElementById("error").textContent =
             "نوبتی با این شماره سریال پیدا نشد.";
 
-          document.getElementById("error").style.display = "block";
+          document.getElementById("error").style.display =
+            "block";
 
           return;
         }
 
 
+        /*
+          قبل از نمایش اطلاعات جدید،
+          نتیجه قبلی کاملاً مخفی می‌شود.
+        */
+
+        document.getElementById("result").style.display =
+          "none";
+
+
         showResult(data);
 
-      } catch (err) {
+      }
+
+      catch (err) {
 
         console.error(err);
 
-        document.getElementById("loading").style.display = "none";
+        document.getElementById("loading").style.display =
+          "none";
 
         document.getElementById("error").textContent =
           "خطایی در ارتباط با سامانه رخ داد.";
 
-        document.getElementById("error").style.display = "block";
+        document.getElementById("error").style.display =
+          "block";
       }
 
     }
 
 
-    // با زدن Enter جستجو انجام شود
+    /*
+      دکمه Enter
+    */
+
     document.getElementById("serial").addEventListener(
       "keydown",
       function(event) {
 
         if (event.key === "Enter") {
+
           searchAppointment();
+
         }
 
       }
     );
 
 
-    // اگر سریال داخل آدرس صفحه باشد، خودکار جستجو شود
-    const urlParams = new URLSearchParams(window.location.search);
+    /*
+      اگر صفحه از طریق QR باز شود:
 
-    const serialFromUrl = urlParams.get("serial");
+      https://bordarpark-ir.github.io/new5/?serial=XXXX
+
+      سریال به صورت خودکار خوانده می‌شود
+      و همان نوبت نمایش داده می‌شود.
+    */
+
+    const urlParams =
+      new URLSearchParams(window.location.search);
+
+    const serialFromUrl =
+      urlParams.get("serial");
+
 
     if (serialFromUrl) {
 
-      document.getElementById("serial").value = serialFromUrl;
+      const serialInput =
+        document.getElementById("serial");
+
+      serialInput.value =
+        serialFromUrl.trim();
 
       searchAppointment();
 
@@ -464,4 +546,4 @@
   </script>
 
 </body>
-    </html>
+</html>
