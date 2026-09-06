@@ -1,1 +1,1386 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پنل مدیریت نوبت‌ها</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="config.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:#f3f5f7;
+color:#222;
+font-family:Tahoma,Arial,sans-serif
+}
+
+.container{
+width:94%;
+max-width:1200px;
+margin:20px auto
+}
+
+.card{
+background:#fff;
+border-radius:14px;
+padding:18px;
+margin-bottom:18px;
+box-shadow:0 2px 12px rgba(0,0,0,.07)
+}
+
+.login{
+max-width:430px;
+margin:60px auto
+}
+
+h1,h2{margin-top:0}
+
+label{
+display:block;
+font-size:14px;
+font-weight:bold;
+margin-top:8px
+}
+
+input{
+width:100%;
+padding:12px;
+border:1px solid #ccc;
+border-radius:9px;
+font-size:15px;
+font-family:inherit;
+margin:5px 0 10px
+}
+
+button{
+border:0;
+border-radius:9px;
+padding:11px 16px;
+font-family:inherit;
+font-size:14px;
+cursor:pointer
+}
+
+.primary{background:#1683d8;color:white}
+.success{background:#198754;color:white}
+.danger{background:#d9363e;color:white}
+.secondary{background:#eef1f4;color:#333}
+.qrbtn{background:#6f42c1;color:white}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px
+}
+
+.actions{
+display:flex;
+gap:8px;
+flex-wrap:wrap
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+flex-wrap:wrap
+}
+
+.message{
+display:none;
+padding:12px;
+border-radius:9px;
+margin-bottom:12px
+}
+
+.ok{
+background:#e7f7ed;
+color:#146c35
+}
+
+.err{
+background:#ffe8e8;
+color:#a40018
+}
+
+.hidden{
+display:none!important
+}
+
+.small{
+color:#666;
+font-size:13px
+}
+
+.table-wrap{
+overflow:auto
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+min-width:1050px
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #eee;
+text-align:right;
+white-space:nowrap
+}
+
+th{
+background:#f7f8fa
+}
+
+.badge{
+padding:5px 9px;
+border-radius:20px;
+background:#e9f2ff;
+color:#1467a5
+}
+
+#qrModal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.65);
+z-index:9999;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:15px
+}
+
+.qrBox{
+background:white;
+width:100%;
+max-width:380px;
+border-radius:18px;
+padding:25px;
+text-align:center
+}
+
+#qrcode{
+display:flex;
+justify-content:center;
+align-items:center;
+margin:20px 0
+}
+
+#qrcode img,
+#qrcode canvas{
+max-width:100%;
+height:auto
+}
+
+.qrSerial{
+font-weight:bold;
+font-size:17px;
+margin-bottom:15px;
+word-break:break-all
+}
+
+.qrUrl{
+background:#f5f5f5;
+border-radius:8px;
+padding:8px;
+font-size:11px;
+direction:ltr;
+word-break:break-all;
+margin-bottom:15px
+}
+
+@media(max-width:700px){
+
+.grid{
+grid-template-columns:1fr
+}
+
+.container{
+width:96%;
+margin:12px auto
+}
+
+.login{
+margin:30px auto
+}
+
+.card{
+padding:14px
+}
+
+h1{
+font-size:22px
+}
+
+h2{
+font-size:19px
+}
+
+button{
+padding:10px 13px
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= ورود مدیر ================= -->
+
+<div id="loginBox" class="card login">
+
+<h1>ورود مدیریت</h1>
+
+<p>برای مدیریت نوبت‌ها وارد شوید.</p>
+
+<div id="loginMsg" class="message err"></div>
+
+<label>ایمیل مدیر</label>
+
+<input
+id="email"
+type="email"
+autocomplete="username"
+placeholder="admin@example.com">
+
+<label>رمز عبور</label>
+
+<input
+id="password"
+type="password"
+autocomplete="current-password"
+placeholder="رمز عبور">
+
+<button
+class="primary"
+style="width:100%"
+onclick="login()">
+
+ورود به پنل
+
+</button>
+
+</div>
+
+
+<!-- ================= پنل مدیریت ================= -->
+
+<div id="app" class="container hidden">
+
+<div class="card">
+
+<div class="top">
+
+<div>
+
+<h1>پنل مدیریت نوبت‌ها</h1>
+
+<div id="userInfo" class="small"></div>
+
+</div>
+
+<button
+class="secondary"
+onclick="logout()">
+
+خروج
+
+</button>
+
+</div>
+
+</div>
+
+
+<div id="mainMsg" class="message"></div>
+
+
+<!-- ================= فرم نوبت ================= -->
+
+<div class="card">
+
+<div class="top">
+
+<h2 id="formTitle">
+ثبت نوبت جدید
+</h2>
+
+<button
+class="secondary"
+onclick="clearForm()">
+
+فرم جدید
+
+</button>
+
+</div>
+
+<input
+type="hidden"
+id="editId">
+
+
+<div class="grid">
+
+<div>
+<label>شماره نوبت / سریال</label>
+<input
+id="serial"
+placeholder="مثلاً FN050501269">
+</div>
+
+<div>
+<label>نام مرز</label>
+<input
+id="border_name"
+placeholder="نام مرز">
+</div>
+
+<div>
+<label>نوع صف</label>
+<input
+id="queue_type"
+placeholder="نوع صف">
+</div>
+
+<div>
+<label>شماره پلاک</label>
+<input
+id="plate_number"
+placeholder="شماره پلاک">
+</div>
+
+<div>
+<label>نوع نوبت</label>
+<input
+id="appointment_type"
+placeholder="نوع نوبت">
+</div>
+
+<div>
+<label>تاریخ / زمان دریافت</label>
+<input
+id="received_at"
+placeholder="تاریخ و ساعت">
+</div>
+
+<div>
+<label>وضعیت</label>
+<input
+id="status"
+placeholder="مثلاً در انتظار">
+</div>
+
+<div>
+<label>ترمینال</label>
+<input
+id="terminal"
+placeholder="ترمینال">
+</div>
+
+<div>
+<label>شماره سرویس</label>
+<input
+id="service_number"
+placeholder="شماره سرویس">
+</div>
+
+<div>
+<label>ورود به ترمینال</label>
+<input
+id="entered_terminal_at"
+placeholder="تاریخ و ساعت">
+</div>
+
+<div>
+<label>فراخوانی</label>
+<input
+id="called_at"
+placeholder="تاریخ و ساعت">
+</div>
+
+<div>
+<label>خروج از ترمینال</label>
+<input
+id="exited_terminal_at"
+placeholder="تاریخ و ساعت">
+</div>
+
+<div>
+<label>مجاز شدن گمرک</label>
+<input
+id="allowed_customs_at"
+placeholder="تاریخ و ساعت">
+</div>
+
+</div>
+
+
+<div class="actions">
+
+<button
+class="primary"
+onclick="saveAppointment()">
+
+ذخیره نوبت
+
+</button>
+
+<button
+class="secondary"
+onclick="clearForm()">
+
+پاک کردن فرم
+
+</button>
+
+</div>
+
+</div>
+
+
+<!-- ================= لیست نوبت‌ها ================= -->
+
+<div class="card">
+
+<div class="top">
+
+<h2>لیست نوبت‌ها</h2>
+
+<button
+class="secondary"
+onclick="loadAppointments()">
+
+🔄 بروزرسانی
+
+</button>
+
+</div>
+
+
+<input
+id="search"
+placeholder="جستجو بر اساس شماره نوبت یا پلاک..."
+oninput="filterRows()">
+
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>سریال</th>
+<th>پلاک</th>
+<th>وضعیت</th>
+<th>مرز</th>
+<th>نوع صف</th>
+<th>تاریخ دریافت</th>
+<th>عملیات</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tableBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ================= پنجره QR ================= -->
+
+<div id="qrModal" class="hidden">
+
+<div class="qrBox">
+
+<h2>QR نوبت</h2>
+
+<div id="qrcode"></div>
+
+<div
+id="qrSerial"
+class="qrSerial">
+</div>
+
+<div
+id="qrUrl"
+class="qrUrl">
+</div>
+
+
+<div
+class="actions"
+style="justify-content:center">
+
+<button
+class="success"
+onclick="downloadQR()">
+
+⬇️ دانلود QR
+
+</button>
+
+<button
+class="primary"
+onclick="printQR()">
+
+🖨 چاپ QR
+
+</button>
+
+<button
+class="secondary"
+onclick="closeQR()">
+
+بستن
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ================= اتصال Supabase ================= */
+
+const supabaseClient =
+window.supabase.createClient(
+window.SUPABASE_URL,
+window.SUPABASE_ANON_KEY
+);
+
+
+/* ================= متغیرها ================= */
+
+let rows = [];
+let currentQRSerial = "";
+
+
+/* ================= فیلدهای نوبت ================= */
+
+const fields = [
+
+"serial",
+"border_name",
+"queue_type",
+"plate_number",
+"appointment_type",
+"received_at",
+"status",
+"terminal",
+"service_number",
+"entered_terminal_at",
+"called_at",
+"exited_terminal_at",
+"allowed_customs_at"
+
+];
+
+
+/* ================= ورود ================= */
+
+async function login(){
+
+const email =
+document.getElementById("email")
+.value.trim();
+
+const password =
+document.getElementById("password")
+.value;
+
+const msg =
+document.getElementById("loginMsg");
+
+msg.style.display = "none";
+
+
+if(!email || !password){
+
+msg.textContent =
+"ایمیل و رمز عبور را وارد کنید.";
+
+msg.style.display = "block";
+
+return;
+
+}
+
+
+const {data,error} =
+await supabaseClient.auth.signInWithPassword({
+
+email:email,
+password:password
+
+});
+
+
+if(error){
+
+msg.textContent =
+"ورود ناموفق بود: " +
+error.message;
+
+msg.style.display = "block";
+
+return;
+
+}
+
+
+showApp(data.user);
+
+}
+
+
+/* ================= بررسی ورود ================= */
+
+async function checkSession(){
+
+const {data} =
+await supabaseClient.auth.getSession();
+
+if(data && data.session){
+
+showApp(data.session.user);
+
+}
+
+}
+
+
+/* ================= نمایش پنل ================= */
+
+async function showApp(user){
+
+document
+.getElementById("loginBox")
+.classList.add("hidden");
+
+document
+.getElementById("app")
+.classList.remove("hidden");
+
+document
+.getElementById("userInfo")
+.textContent =
+"مدیر وارد شده: " +
+(user.email || "");
+
+await loadAppointments();
+
+}
+
+
+/* ================= خروج ================= */
+
+async function logout(){
+
+await supabaseClient.auth.signOut();
+
+location.reload();
+
+}
+
+
+/* ================= پیام ================= */
+
+function showMessage(text,type="ok"){
+
+const box =
+document.getElementById("mainMsg");
+
+box.className =
+"message " +
+(type === "ok" ? "ok" : "err");
+
+box.textContent = text;
+
+box.style.display = "block";
+
+setTimeout(function(){
+
+box.style.display = "none";
+
+},4000);
+
+}
+
+
+/* ================= اطلاعات فرم ================= */
+
+function getFormObject(){
+
+const obj = {};
+
+fields.forEach(function(id){
+
+obj[id] =
+document
+.getElementById(id)
+.value
+.trim();
+
+});
+
+return obj;
+
+}
+
+
+/* ================= ذخیره نوبت ================= */
+
+async function saveAppointment(){
+
+const id =
+document
+.getElementById("editId")
+.value;
+
+const obj =
+getFormObject();
+
+
+if(!obj.serial){
+
+showMessage(
+"شماره نوبت را وارد کنید.",
+"err"
+);
+
+return;
+
+}
+
+
+let result;
+
+
+if(id){
+
+result =
+await supabaseClient
+.from("appointments")
+.update(obj)
+.eq("id",id);
+
+}else{
+
+result =
+await supabaseClient
+.from("appointments")
+.insert(obj);
+
+}
+
+
+if(result.error){
+
+showMessage(
+"خطا: " +
+result.error.message,
+"err"
+);
+
+return;
+
+}
+
+
+showMessage(
+id ?
+"نوبت با موفقیت ویرایش شد." :
+"نوبت با موفقیت ثبت شد."
+);
+
+
+clearForm();
+
+await loadAppointments();
+
+}
+
+
+/* ================= پاک کردن فرم ================= */
+
+function clearForm(){
+
+document
+.getElementById("editId")
+.value = "";
+
+fields.forEach(function(id){
+
+document
+.getElementById(id)
+.value = "";
+
+});
+
+
+document
+.getElementById("formTitle")
+.textContent =
+"ثبت نوبت جدید";
+
+}
+
+
+/* ================= دریافت نوبت‌ها ================= */
+
+async function loadAppointments(){
+
+const {data,error} =
+await supabaseClient
+.from("appointments")
+.select("*")
+.order("id",{ascending:false})
+.limit(500);
+
+
+if(error){
+
+showMessage(
+"خطا در دریافت نوبت‌ها: " +
+error.message,
+"err"
+);
+
+return;
+
+}
+
+
+rows = data || [];
+
+filterRows();
+
+}
+
+
+/* ================= جستجو ================= */
+
+function filterRows(){
+
+const q =
+document
+.getElementById("search")
+.value
+.trim()
+.toLowerCase();
+
+
+const filtered =
+rows.filter(function(r){
+
+const text =
+String(r.serial || "") +
+" " +
+String(r.plate_number || "");
+
+return text
+.toLowerCase()
+.includes(q);
+
+});
+
+
+render(filtered);
+
+}
+
+
+/* ================= نمایش جدول ================= */
+
+function render(list){
+
+const body =
+document.getElementById("tableBody");
+
+
+if(!list.length){
+
+body.innerHTML = `
+<tr>
+<td colspan="7"
+style="text-align:center;padding:25px">
+
+نوبتی پیدا نشد.
+
+</td>
+</tr>
+`;
+
+return;
+
+}
+
+
+body.innerHTML =
+list.map(function(r){
+
+const json =
+JSON.stringify(r)
+.replace(/'/g,"&#39;");
+
+
+return `
+
+<tr>
+
+<td>
+${esc(r.serial)}
+</td>
+
+<td>
+${esc(r.plate_number)}
+</td>
+
+<td>
+
+<span class="badge">
+${esc(r.status)}
+</span>
+
+</td>
+
+<td>
+${esc(r.border_name)}
+</td>
+
+<td>
+${esc(r.queue_type)}
+</td>
+
+<td>
+${esc(r.received_at)}
+</td>
+
+<td>
+
+<div class="actions">
+
+<button
+class="qrbtn"
+onclick='makeQR(${json})'>
+
+📱 QR
+
+</button>
+
+<button
+class="secondary"
+onclick='editRow(${json})'>
+
+ویرایش
+
+</button>
+
+<button
+class="danger"
+onclick="deleteRow('${String(r.id).replace(/'/g,"\\'")}')">
+
+حذف
+
+</button>
+
+</div>
+
+</td>
+
+</tr>
+
+`;
+
+}).join("");
+
+}
+
+
+/* ================= ویرایش ================= */
+
+function editRow(row){
+
+document
+.getElementById("editId")
+.value =
+row.id || "";
+
+
+fields.forEach(function(id){
+
+document
+.getElementById(id)
+.value =
+row[id] || "";
+
+});
+
+
+document
+.getElementById("formTitle")
+.textContent =
+"ویرایش نوبت";
+
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+}
+
+
+/* ================= حذف ================= */
+
+async function deleteRow(id){
+
+if(!confirm(
+"آیا از حذف این نوبت مطمئن هستید؟"
+)){
+
+return;
+
+}
+
+
+const {error} =
+await supabaseClient
+.from("appointments")
+.delete()
+.eq("id",id);
+
+
+if(error){
+
+showMessage(
+"خطا در حذف: " +
+error.message,
+"err"
+);
+
+return;
+
+}
+
+
+showMessage(
+"نوبت با موفقیت حذف شد."
+);
+
+await loadAppointments();
+
+}
+
+
+/* ================= امن کردن متن ================= */
+
+function esc(value){
+
+return String(value || "")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* ================= ساخت QR ================= */
+
+function makeQR(row){
+
+const serial =
+String(row.serial || "")
+.trim();
+
+
+if(!serial){
+
+alert(
+"این نوبت شماره سریال ندارد."
+);
+
+return;
+
+}
+
+
+currentQRSerial = serial;
+
+
+/*
+لینک QR به صفحه عمومی New5
+*/
+
+const url =
+"https://bordarpark-ir.github.io/new5/?serial=" +
+encodeURIComponent(serial);
+
+
+document
+.getElementById("qrModal")
+.classList
+.remove("hidden");
+
+
+document
+.getElementById("qrcode")
+.innerHTML = "";
+
+
+document
+.getElementById("qrSerial")
+.textContent =
+"شماره نوبت: " + serial;
+
+
+document
+.getElementById("qrUrl")
+.textContent =
+url;
+
+
+new QRCode(
+document.getElementById("qrcode"),
+{
+text:url,
+width:240,
+height:240,
+correctLevel:
+QRCode.CorrectLevel.H
+}
+);
+
+}
+
+
+/* ================= بستن QR ================= */
+
+function closeQR(){
+
+document
+.getElementById("qrModal")
+.classList
+.add("hidden");
+
+}
+
+
+/* ================= دانلود QR ================= */
+
+function downloadQR(){
+
+const box =
+document.getElementById("qrcode");
+
+const canvas =
+box.querySelector("canvas");
+
+const img =
+box.querySelector("img");
+
+let dataURL = "";
+
+
+if(canvas){
+
+dataURL =
+canvas.toDataURL("image/png");
+
+}else if(img){
+
+dataURL =
+img.src;
+
+}else{
+
+alert(
+"QR هنوز آماده نشده است."
+);
+
+return;
+
+}
+
+
+const a =
+document.createElement("a");
+
+a.href = dataURL;
+
+a.download =
+"QR-" +
+currentQRSerial +
+".png";
+
+
+document.body.appendChild(a);
+
+a.click();
+
+a.remove();
+
+}
+
+
+/* ================= چاپ QR ================= */
+
+function printQR(){
+
+const box =
+document.getElementById("qrcode");
+
+const canvas =
+box.querySelector("canvas");
+
+const img =
+box.querySelector("img");
+
+let image = "";
+
+
+if(canvas){
+
+image =
+canvas.toDataURL("image/png");
+
+}else if(img){
+
+image =
+img.src;
+
+}else{
+
+alert(
+"QR آماده نیست."
+);
+
+return;
+
+}
+
+
+const serial =
+currentQRSerial;
+
+
+const w =
+window.open(
+"",
+"_blank",
+"width=500,height=700"
+);
+
+
+if(!w){
+
+alert(
+"پنجره چاپ توسط مرورگر مسدود شده است."
+);
+
+return;
+
+}
+
+
+w.document.write(`
+
+<!DOCTYPE html>
+
+<html lang="fa" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>QR نوبت</title>
+
+<style>
+
+body{
+text-align:center;
+font-family:Tahoma,Arial,sans-serif;
+padding:40px;
+}
+
+img{
+width:240px;
+height:240px;
+margin:25px;
+}
+
+h2{
+margin-bottom:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>QR نوبت</h2>
+
+<img src="${image}">
+
+<h3>
+شماره نوبت: ${esc(serial)}
+</h3>
+
+<script>
+
+window.onload=function(){
+
+setTimeout(function(){
+
+window.print();
+
+},500);
+
+};
+
+<\/script>
+
+</body>
+
+</html>
+
+`);
+
+
+w.document.close();
+
+}
+
+
+/* ================= شروع ================= */
+
+checkSession();
+
+</script>
+
+</body>
+</html>
