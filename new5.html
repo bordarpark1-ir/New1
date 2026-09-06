@@ -2,115 +2,91 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>استعلام نوبت</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
+<script src="../config.js"></script>
 
 <style>
-*{
-    box-sizing:border-box;
-}
-
 body{
-    margin:0;
-    font-family:Tahoma,Arial,sans-serif;
-    background:#f4f7fb;
-    color:#222;
+margin:0;
+font-family:Tahoma,Arial,sans-serif;
+background:#f4f7fb;
+color:#222
 }
-
 .header{
-    background:linear-gradient(135deg,#087f5b,#12b886);
-    color:white;
-    padding:28px 15px;
-    text-align:center;
+background:linear-gradient(135deg,#087f5b,#12b886);
+color:white;
+padding:28px 15px;
+text-align:center
 }
-
 .header h1{
-    margin:0;
-    font-size:28px;
+margin:0;
+font-size:28px
 }
-
 .header p{
-    margin:10px 0 0;
-    font-size:15px;
+margin:10px 0 0;
+font-size:15px
 }
-
 .container{
-    max-width:700px;
-    margin:30px auto;
-    padding:0 15px;
+max-width:700px;
+margin:30px auto;
+padding:0 15px
 }
-
 .card{
-    background:white;
-    border-radius:18px;
-    padding:22px;
-    box-shadow:0 5px 25px rgba(0,0,0,.08);
+background:white;
+border-radius:18px;
+padding:22px;
+box-shadow:0 5px 25px rgba(0,0,0,.08)
 }
-
-.search-box{
-    display:flex;
-    gap:10px;
-    margin-bottom:20px;
+.search{
+display:flex;
+gap:10px;
+margin-bottom:20px
 }
-
-.search-box input{
-    flex:1;
-    padding:14px;
-    border:1px solid #ddd;
-    border-radius:12px;
-    font-size:16px;
-    outline:none;
+input{
+flex:1;
+padding:14px;
+border:1px solid #ddd;
+border-radius:12px;
+font-size:16px
 }
-
-.search-box button{
-    border:0;
-    background:#087f5b;
-    color:white;
-    padding:0 22px;
-    border-radius:12px;
-    font-size:16px;
-    cursor:pointer;
+button{
+border:0;
+background:#087f5b;
+color:white;
+padding:0 22px;
+border-radius:12px;
+font-size:16px
 }
-
-.result{
-    display:none;
-}
-
 .row{
-    display:flex;
-    justify-content:space-between;
-    gap:15px;
-    padding:13px 5px;
-    border-bottom:1px solid #eee;
+display:flex;
+justify-content:space-between;
+gap:15px;
+padding:13px 5px;
+border-bottom:1px solid #eee
 }
-
-.row:last-child{
-    border-bottom:0;
-}
-
 .label{
-    color:#666;
-    font-weight:bold;
+color:#666;
+font-weight:bold
 }
-
 .value{
-    color:#111;
-    text-align:left;
-    word-break:break-word;
+color:#111;
+text-align:left;
+word-break:break-word
 }
-
-.message{
-    display:none;
-    padding:15px;
-    border-radius:12px;
-    margin-top:15px;
-    text-align:center;
-    background:#fff3cd;
-    color:#856404;
+#result{
+display:none
+}
+#message{
+display:none;
+padding:15px;
+border-radius:12px;
+margin-top:15px;
+text-align:center;
+background:#fff3cd;
+color:#856404
 }
 </style>
 </head>
@@ -118,353 +94,131 @@ body{
 <body>
 
 <div class="header">
-    <h1>استعلام نوبت</h1>
-    <p>سامانه استعلام وضعیت نوبت خودرو</p>
+<h1>استعلام نوبت</h1>
+<p>سامانه استعلام وضعیت نوبت خودرو</p>
 </div>
 
 <div class="container">
+<div class="card">
 
-    <div class="card">
+<div class="search">
+<input id="serial" placeholder="شماره سریال نوبت را وارد کنید">
+<button onclick="manualSearch()">استعلام</button>
+</div>
 
-        <div class="search-box">
-            <input
-                type="text"
-                id="serial"
-                placeholder="شماره سریال نوبت را وارد کنید"
-            >
+<div id="message"></div>
 
-            <button onclick="searchAppointment()">
-                استعلام
-            </button>
-        </div>
+<div id="result">
 
-        <div id="message" class="message"></div>
+<div class="row"><span class="label">شماره سریال</span><span class="value" id="serial_v"></span></div>
+<div class="row"><span class="label">مرز</span><span class="value" id="border_v"></span></div>
+<div class="row"><span class="label">نوع صف</span><span class="value" id="queue_v"></span></div>
+<div class="row"><span class="label">شماره پلاک</span><span class="value" id="plate_v"></span></div>
+<div class="row"><span class="label">نوع نوبت</span><span class="value" id="type_v"></span></div>
+<div class="row"><span class="label">زمان دریافت نوبت</span><span class="value" id="received_v"></span></div>
+<div class="row"><span class="label">وضعیت</span><span class="value" id="status_v"></span></div>
+<div class="row"><span class="label">ترمینال</span><span class="value" id="terminal_v"></span></div>
+<div class="row"><span class="label">شماره خدمت</span><span class="value" id="service_v"></span></div>
+<div class="row"><span class="label">ورود به ترمینال</span><span class="value" id="entered_v"></span></div>
+<div class="row"><span class="label">فراخوانی</span><span class="value" id="called_v"></span></div>
+<div class="row"><span class="label">خروج از ترمینال</span><span class="value" id="exited_v"></span></div>
+<div class="row"><span class="label">اجازه گمرک</span><span class="value" id="customs_v"></span></div>
 
-        <div id="result" class="result">
-
-            <div class="row">
-                <span class="label">شماره سریال</span>
-                <span class="value" id="r_serial">-</span>
-            </div>
-
-            <div class="row">
-                <span class="label">مرز</span>
-                <span class="value" id="r_border_name">-</span>
-            </div>
-
-            <div class="row">
-                <span class="label">نوع صف</span>
-                <span class="value" id="r_queue_type">-</span>
-            </div>
-
-            <div class="row">
-                <span class="label">شماره پلاک</span>
-                <span class="value" id="r_plate_number">-</span>
-            </div>
-
-            <div class="row">
-                <span class="label">نوع نوبت</span>
-                <span class="value" id="r_appointment_type">-</span>
-            </div>
-
-            <div class="row">
-                <span class="label">زمان دریافت نوبت</span>
-                <span class="value" id="r_received_at">-</span>
-            </div>
-
-            <div class="row">
-                <span class="label">وضعیت</span>
-                <span class="value" id="r_status">-</span>
-            </div>
-
-            <div class="row">
-                <span class="label">ترمینال</span>
-                <span class="value" id="r_terminal">-</span>
-            </div>
-
-            <div class="row">
-                <span class="label">شماره خدمت</span>
-                <span class="value" id="r_service_number">-</span>
-            </div>
-
-            <div class="row">
-                <span class="label">ورود به ترمینال</span>
-                <span class="value" id="r_entered_terminal_at">-</span>
-            </div>
-
-            <div class="row">
-                <span class="label">فراخوانی</span>
-                <span class="value" id="r_called_at">-</span>
-            </div>
-
-            <div class="row">
-                <span class="label">خروج از ترمینال</span>
-                <span class="value" id="r_exited_terminal_at">-</span>
-            </div>
-
-            <div class="row">
-                <span class="label">اجازه گمرک</span>
-                <span class="value" id="r_allowed_customs_at">-</span>
-            </div>
-
-        </div>
-
-    </div>
-
+</div>
+</div>
 </div>
 
 <script>
 
-const supabaseClient = window.supabase.createClient(
-    window.SUPABASE_URL,
-    window.SUPABASE_ANON_KEY
+const db = window.supabase.createClient(
+window.SUPABASE_URL,
+window.SUPABASE_ANON_KEY
 );
 
-
-/* نمایش پیام */
-
-function showMessage(text){
-
-    const box = document.getElementById("message");
-
-    box.style.display = "block";
-    box.textContent = text;
+function val(id){
+return document.getElementById(id);
 }
 
+function show(row){
 
-/* پاک کردن پیام */
+val("result").style.display="block";
 
-function hideMessage(){
+val("serial_v").textContent=row.serial ?? "-";
+val("border_v").textContent=row.border_name ?? "-";
+val("queue_v").textContent=row.queue_type ?? "-";
+val("plate_v").textContent=row.plate_number ?? "-";
+val("type_v").textContent=row.appointment_type ?? "-";
+val("received_v").textContent=row.received_at ?? "-";
+val("status_v").textContent=row.status ?? "-";
+val("terminal_v").textContent=row.terminal ?? "-";
+val("service_v").textContent=row.service_number ?? "-";
+val("entered_v").textContent=row.entered_terminal_at ?? "-";
+val("called_v").textContent=row.called_at ?? "-";
+val("exited_v").textContent=row.exited_terminal_at ?? "-";
+val("customs_v").textContent=row.allowed_customs_at ?? "-";
 
-    document.getElementById("message").style.display = "none";
 }
 
+async function getById(){
 
-/* نمایش اطلاعات */
+val("message").style.display="none";
+val("result").style.display="none";
 
-function showResult(row){
+const params=new URLSearchParams(window.location.search);
+const id=params.get("id");
 
-    document.getElementById("result").style.display = "block";
-
-    document.getElementById("r_serial").textContent =
-        row.serial ?? "-";
-
-    document.getElementById("r_border_name").textContent =
-        row.border_name ?? "-";
-
-    document.getElementById("r_queue_type").textContent =
-        row.queue_type ?? "-";
-
-    document.getElementById("r_plate_number").textContent =
-        row.plate_number ?? "-";
-
-    document.getElementById("r_appointment_type").textContent =
-        row.appointment_type ?? "-";
-
-    document.getElementById("r_received_at").textContent =
-        row.received_at ?? "-";
-
-    document.getElementById("r_status").textContent =
-        row.status ?? "-";
-
-    document.getElementById("r_terminal").textContent =
-        row.terminal ?? "-";
-
-    document.getElementById("r_service_number").textContent =
-        row.service_number ?? "-";
-
-    document.getElementById("r_entered_terminal_at").textContent =
-        row.entered_terminal_at ?? "-";
-
-    document.getElementById("r_called_at").textContent =
-        row.called_at ?? "-";
-
-    document.getElementById("r_exited_terminal_at").textContent =
-        row.exited_terminal_at ?? "-";
-
-    document.getElementById("r_allowed_customs_at").textContent =
-        row.allowed_customs_at ?? "-";
+if(!id){
+val("message").textContent="شناسه نوبت وجود ندارد.";
+val("message").style.display="block";
+return;
 }
 
+const {data,error}=await db
+.from("appointments")
+.select("*")
+.eq("id",Number(id))
+.maybeSingle();
 
-/* =====================================================
-   استعلام نوبت
-   ===================================================== */
-
-async function searchAppointment(){
-
-    hideMessage();
-
-    document.getElementById("result").style.display = "none";
-
-
-    const url = new URL(window.location.href);
-
-    /*
-       فقط ID را از QR می‌گیریم.
-       serial در URL کاملاً نادیده گرفته می‌شود.
-    */
-
-    const qrId = url.searchParams.get("id");
-
-
-    /*
-       اگر QR دارای ID باشد
-       فقط بر اساس ID جستجو می‌کنیم.
-    */
-
-    if(qrId !== null && qrId.trim() !== ""){
-
-        const numericId = Number(qrId);
-
-
-        if(!Number.isInteger(numericId)){
-
-            showMessage("شناسه QR معتبر نیست.");
-
-            return;
-        }
-
-
-        const { data, error } =
-            await supabaseClient
-                .from("appointments")
-                .select("*")
-                .eq("id", numericId)
-                .single();
-
-
-        if(error){
-
-            console.error("Supabase Error:", error);
-
-            showMessage(
-                "خطا در دریافت اطلاعات نوبت: " +
-                error.message
-            );
-
-            return;
-        }
-
-
-        if(!data){
-
-            showMessage(
-                "اطلاعات این نوبت پیدا نشد."
-            );
-
-            return;
-        }
-
-
-        /*
-           نمایش همان رکوردی که ID آن داخل QR بوده
-        */
-
-        showResult(data);
-
-        return;
-    }
-
-
-    /*
-       اگر QR فاقد ID بود،
-       جستجوی دستی با سریال انجام می‌شود.
-    */
-
-    const manualSerial =
-        document.getElementById("serial").value.trim();
-
-
-    if(!manualSerial){
-
-        showMessage(
-            "لطفاً شماره سریال نوبت را وارد کنید."
-        );
-
-        return;
-    }
-
-
-    const { data, error } =
-        await supabaseClient
-            .from("appointments")
-            .select("*")
-            .eq("serial", manualSerial)
-            .limit(1)
-            .maybeSingle();
-
-
-    if(error){
-
-        console.error("Supabase Error:", error);
-
-        showMessage(
-            "خطا در دریافت اطلاعات نوبت: " +
-            error.message
-        );
-
-        return;
-    }
-
-
-    if(!data){
-
-        showMessage(
-            "نوبتی با این شماره سریال پیدا نشد."
-        );
-
-        return;
-    }
-
-
-    showResult(data);
+if(error){
+console.error(error);
+val("message").textContent="خطا در دریافت اطلاعات.";
+val("message").style.display="block";
+return;
 }
 
+if(!data){
+val("message").textContent="نوبتی با این شناسه پیدا نشد.";
+val("message").style.display="block";
+return;
+}
 
-/* =====================================================
-   اجرای خودکار هنگام باز شدن QR
-   ===================================================== */
+show(data);
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function(){
+}
 
-        const url =
-            new URL(window.location.href);
+async function manualSearch(){
 
-        const qrId =
-            url.searchParams.get("id");
+const serial=val("serial").value.trim();
 
-        const qrSerial =
-            url.searchParams.get("serial");
+if(!serial)return;
 
+const {data,error}=await db
+.from("appointments")
+.select("*")
+.eq("serial",serial)
+.maybeSingle();
 
-        /*
-           فقط برای نمایش داخل کادر ورودی،
-           سریال QR را نشان می‌دهیم.
-           در صورت وجود ID، جستجو فقط با ID انجام می‌شود.
-        */
+if(error||!data){
+val("message").textContent="نوبت پیدا نشد.";
+val("message").style.display="block";
+return;
+}
 
-        if(qrSerial){
+show(data);
 
-            document.getElementById("serial").value =
-                qrSerial;
-        }
+}
 
-
-        /*
-           اگر ID وجود داشته باشد،
-           استعلام خودکار انجام می‌شود.
-        */
-
-        if(qrId){
-
-            searchAppointment();
-        }
-
-    }
-);
+document.addEventListener("DOMContentLoaded",getById);
 
 </script>
 
