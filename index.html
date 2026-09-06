@@ -390,3 +390,11 @@ function showAppointment(data) {
     valueOrDash(data.serial);
 
   document.getElementById("border_name").text
+<script>
+const testId = new URLSearchParams(window.location.search).get("id");
+
+if (testId) {
+  document.querySelector(".header p").textContent =
+    "شناسه نوبت: " + testId;
+}
+</script>
