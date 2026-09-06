@@ -1,1 +1,1292 @@
 
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>پنل مدیریت نوبت‌ها</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./config.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f1f5f9;
+      color: #172033;
+      font-family: Tahoma, Arial, sans-serif;
+    }
+
+    .container {
+      width: 94%;
+      max-width: 1200px;
+      margin: 20px auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 18px rgba(0,0,0,.08);
+    }
+
+    .login-box {
+      max-width: 430px;
+      margin: 60px auto;
+    }
+
+    h1, h2 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      margin: 8px 0 5px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ccd3dc;
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: #1976d2;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-family: inherit;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(.98);
+    }
+
+    .primary {
+      background: #1976d2;
+      color: white;
+    }
+
+    .danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .secondary {
+      background: #e9eef3;
+      color: #172033;
+    }
+
+    .success {
+      background: #198754;
+      color: white;
+    }
+
+    .full {
+      width: 100%;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .message {
+      padding: 13px;
+      border-radius: 10px;
+      margin: 12px 0;
+      display: none;
+      line-height: 1.8;
+    }
+
+    .error {
+      background: #ffe5e5;
+      color: #a40000;
+    }
+
+    .ok {
+      background: #e5f7eb;
+      color: #126b31;
+    }
+
+    .info {
+      background: #e6f2ff;
+      color: #145b91;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 15px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 950px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 11px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f5f7fa;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      background: #e7f1ff;
+      color: #145b91;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 30px;
+      color: #777;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #687386;
+      line-height: 1.8;
+    }
+
+    .status-box {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 9px;
+      background: #f7f8fa;
+      font-size: 13px;
+      direction: rtl;
+    }
+
+    @media(max-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media(max-width: 550px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        width: 96%;
+        margin: 10px auto;
+      }
+
+      .card {
+        padding: 15px;
+      }
+
+      .login-box {
+        margin: 25px auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- =========================
+     LOGIN
+========================= -->
+
+<div id="loginBox" class="container">
+
+  <div class="card login-box">
+
+    <h1>🔐 ورود مدیریت</h1>
+
+    <p class="small">
+      برای مدیریت نوبت‌ها، ایمیل و رمز عبور مدیر را وارد کنید.
+    </p>
+
+    <div id="loginMessage" class="message"></div>
+
+    <label for="email">ایمیل مدیر</label>
+    <input
+      id="email"
+      type="email"
+      autocomplete="username"
+      placeholder="admin@example.com"
+    >
+
+    <label for="password">رمز عبور</label>
+    <input
+      id="password"
+      type="password"
+      autocomplete="current-password"
+      placeholder="رمز عبور"
+    >
+
+    <button
+      id="loginButton"
+      class="primary full"
+      onclick="login()"
+    >
+      ورود به پنل
+    </button>
+
+    <div id="connectionStatus" class="status-box">
+      در حال بررسی اتصال...
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     ADMIN PANEL
+========================= -->
+
+<div id="adminPanel" class="container hidden">
+
+  <div class="card">
+
+    <div class="top">
+
+      <div>
+        <h1>📋 پنل مدیریت نوبت‌ها</h1>
+        <div id="userInfo" class="small"></div>
+      </div>
+
+      <button class="secondary" onclick="logout()">
+        خروج
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div id="mainMessage" class="message"></div>
+
+
+  <!-- FORM -->
+
+  <div class="card">
+
+    <h2 id="formTitle">➕ ثبت نوبت جدید</h2>
+
+    <input
+      id="editId"
+      type="hidden"
+    >
+
+    <div class="grid">
+
+      <div>
+        <label>سریال نوبت *</label>
+        <input id="serial" placeholder="مثلاً FN050501269">
+      </div>
+
+      <div>
+        <label>نام مرز</label>
+        <input id="border_name">
+      </div>
+
+      <div>
+        <label>نوع صف</label>
+        <input id="queue_type">
+      </div>
+
+      <div>
+        <label>شماره پلاک</label>
+        <input id="plate_number">
+      </div>
+
+      <div>
+        <label>نوع نوبت</label>
+        <input id="appointment_type">
+      </div>
+
+      <div>
+        <label>زمان دریافت نوبت</label>
+        <input id="received_at">
+      </div>
+
+      <div>
+        <label>وضعیت</label>
+        <input id="status" placeholder="در انتظار">
+      </div>
+
+      <div>
+        <label>تیرپارک</label>
+        <input id="terminal">
+      </div>
+
+      <div>
+        <label>شماره سرویس</label>
+        <input id="service_number">
+      </div>
+
+      <div>
+        <label>زمان ورود به تیرپارک</label>
+        <input id="entered_terminal_at">
+      </div>
+
+      <div>
+        <label>زمان فراخوان</label>
+        <input id="called_at">
+      </div>
+
+      <div>
+        <label>زمان خروج از تیرپارک</label>
+        <input id="exited_terminal_at">
+      </div>
+
+      <div>
+        <label>زمان مجاز ورود به گمرک</label>
+        <input id="allowed_customs_at">
+      </div>
+
+    </div>
+
+    <div class="actions">
+
+      <button
+        id="saveButton"
+        class="primary"
+        onclick="saveAppointment()"
+      >
+        💾 ذخیره نوبت
+      </button>
+
+      <button
+        id="cancelButton"
+        class="secondary hidden"
+        onclick="resetForm()"
+      >
+        لغو ویرایش
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- LIST -->
+
+  <div class="card">
+
+    <div class="top">
+
+      <h2>📑 فهرست نوبت‌ها</h2>
+
+      <button
+        class="primary"
+        onclick="loadAppointments()"
+      >
+        🔄 بروزرسانی
+      </button>
+
+    </div>
+
+    <input
+      id="search"
+      placeholder="جستجو بر اساس سریال یا پلاک..."
+      oninput="filterRows()"
+    >
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>سریال</th>
+            <th>پلاک</th>
+            <th>وضعیت</th>
+            <th>مرز</th>
+            <th>نوع صف</th>
+            <th>تاریخ دریافت</th>
+            <th>عملیات</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="tableBody">
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+"use strict";
+
+
+/* =========================
+   VARIABLES
+========================= */
+
+let supabaseClient = null;
+
+let appointmentRows = [];
+
+
+/* =========================
+   FIELDS
+========================= */
+
+const fields = [
+  "serial",
+  "border_name",
+  "queue_type",
+  "plate_number",
+  "appointment_type",
+  "received_at",
+  "status",
+  "terminal",
+  "service_number",
+  "entered_terminal_at",
+  "called_at",
+  "exited_terminal_at",
+  "allowed_customs_at"
+];
+
+
+/* =========================
+   ELEMENT
+========================= */
+
+function $(id) {
+  return document.getElementById(id);
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+function showLoginMessage(text, type) {
+
+  const box = $("loginMessage");
+
+  box.textContent = text;
+
+  box.className = "message " + type;
+
+  box.style.display = "block";
+}
+
+
+function showMainMessage(text, type) {
+
+  const box = $("mainMessage");
+
+  box.textContent = text;
+
+  box.className = "message " + type;
+
+  box.style.display = "block";
+}
+
+
+/* =========================
+   CONNECTION
+========================= */
+
+function checkConfig() {
+
+  const status = $("connectionStatus");
+
+  if (!window.SUPABASE_URL) {
+
+    status.textContent =
+      "❌ SUPABASE_URL پیدا نشد. فایل config.js را بررسی کنید.";
+
+    status.style.background = "#ffe5e5";
+
+    return false;
+  }
+
+  if (!window.SUPABASE_ANON_KEY) {
+
+    status.textContent =
+      "❌ SUPABASE_ANON_KEY پیدا نشد. فایل config.js را بررسی کنید.";
+
+    status.style.background = "#ffe5e5";
+
+    return false;
+  }
+
+  try {
+
+    supabaseClient =
+      window.supabase.createClient(
+        window.SUPABASE_URL,
+        window.SUPABASE_ANON_KEY
+      );
+
+    status.textContent =
+      "✅ اتصال اولیه به Supabase آماده است.";
+
+    status.style.background = "#e5f7eb";
+
+    return true;
+
+  } catch (error) {
+
+    status.textContent =
+      "❌ خطا در ساخت اتصال Supabase: " + error.message;
+
+    status.style.background = "#ffe5e5";
+
+    return false;
+  }
+}
+
+
+/* =========================
+   INIT
+========================= */
+
+async function init() {
+
+  const connected = checkConfig();
+
+  if (!connected) {
+    return;
+  }
+
+  try {
+
+    const result =
+      await supabaseClient.auth.getSession();
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    if (
+      result.data &&
+      result.data.session
+    ) {
+
+      showAdminPanel(
+        result.data.session
+      );
+
+    }
+
+  } catch (error) {
+
+    showLoginMessage(
+      "خطا در بررسی ورود: " +
+      error.message,
+      "error"
+    );
+  }
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+async function login() {
+
+  if (!supabaseClient) {
+
+    showLoginMessage(
+      "اتصال Supabase برقرار نشده است.",
+      "error"
+    );
+
+    return;
+  }
+
+  const email =
+    $("email").value.trim();
+
+  const password =
+    $("password").value;
+
+  if (!email || !password) {
+
+    showLoginMessage(
+      "ایمیل و رمز عبور را وارد کنید.",
+      "error"
+    );
+
+    return;
+  }
+
+  const button =
+    $("loginButton");
+
+  button.disabled = true;
+
+  button.textContent =
+    "در حال ورود...";
+
+  try {
+
+    const result =
+      await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    showAdminPanel(
+      result.data.session
+    );
+
+  } catch (error) {
+
+    showLoginMessage(
+      "ورود ناموفق: " +
+      error.message,
+      "error"
+    );
+
+  } finally {
+
+    button.disabled = false;
+
+    button.textContent =
+      "ورود به پنل";
+  }
+}
+
+
+/* =========================
+   SHOW ADMIN
+========================= */
+
+function showAdminPanel(session) {
+
+  $("loginBox").classList.add("hidden");
+
+  $("adminPanel").classList.remove("hidden");
+
+  if (
+    session &&
+    session.user
+  ) {
+
+    $("userInfo").textContent =
+      "مدیر وارد شده: " +
+      (session.user.email || "-");
+  }
+
+  loadAppointments();
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout() {
+
+  try {
+
+    if (supabaseClient) {
+      await supabaseClient.auth.signOut();
+    }
+
+  } finally {
+
+    location.reload();
+
+  }
+}
+
+
+/* =========================
+   GET FORM
+========================= */
+
+function getFormData() {
+
+  const data = {};
+
+  fields.forEach(function(field) {
+
+    const input = $(field);
+
+    if (!input) return;
+
+    const value =
+      input.value.trim();
+
+    data[field] =
+      value === ""
+        ? null
+        : value;
+  });
+
+  return data;
+}
+
+
+/* =========================
+   RESET FORM
+========================= */
+
+function resetForm() {
+
+  fields.forEach(function(field) {
+
+    const input = $(field);
+
+    if (input) {
+      input.value = "";
+    }
+
+  });
+
+  $("editId").value = "";
+
+  $("formTitle").textContent =
+    "➕ ثبت نوبت جدید";
+
+  $("cancelButton")
+    .classList.add("hidden");
+
+  $("saveButton").textContent =
+    "💾 ذخیره نوبت";
+}
+
+
+/* =========================
+   FILL FORM
+========================= */
+
+function editAppointment(row) {
+
+  fields.forEach(function(field) {
+
+    const input = $(field);
+
+    if (!input) return;
+
+    input.value =
+      row[field] == null
+        ? ""
+        : row[field];
+  });
+
+  $("editId").value =
+    row.id == null
+      ? ""
+      : row.id;
+
+  $("formTitle").textContent =
+    "✏️ ویرایش نوبت";
+
+  $("cancelButton")
+    .classList.remove("hidden");
+
+  $("saveButton").textContent =
+    "💾 ذخیره تغییرات";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+
+/* =========================
+   SAVE
+========================= */
+
+async function saveAppointment() {
+
+  if (!supabaseClient) {
+
+    showMainMessage(
+      "اتصال Supabase برقرار نیست.",
+      "error"
+    );
+
+    return;
+  }
+
+  const data =
+    getFormData();
+
+  if (!data.serial) {
+
+    showMainMessage(
+      "شماره سریال نوبت الزامی است.",
+      "error"
+    );
+
+    return;
+  }
+
+  const id =
+    $("editId").value.trim();
+
+  const button =
+    $("saveButton");
+
+  button.disabled = true;
+
+  button.textContent =
+    "در حال ذخیره...";
+
+  try {
+
+    let result;
+
+    if (id) {
+
+      result =
+        await supabaseClient
+          .from("appointments")
+          .update(data)
+          .eq("id", id);
+
+    } else {
+
+      result =
+        await supabaseClient
+          .from("appointments")
+          .insert(data);
+
+    }
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    showMainMessage(
+      id
+        ? "✅ نوبت با موفقیت ویرایش شد."
+        : "✅ نوبت با موفقیت ثبت شد.",
+      "ok"
+    );
+
+    resetForm();
+
+    await loadAppointments();
+
+  } catch (error) {
+
+    showMainMessage(
+      "❌ خطا در ذخیره نوبت: " +
+      error.message,
+      "error"
+    );
+
+  } finally {
+
+    button.disabled = false;
+
+    button.textContent =
+      id
+        ? "💾 ذخیره تغییرات"
+        : "💾 ذخیره نوبت";
+  }
+}
+
+
+/* =========================
+   LOAD
+========================= */
+
+async function loadAppointments() {
+
+  if (!supabaseClient) {
+
+    showMainMessage(
+      "اتصال Supabase برقرار نیست.",
+      "error"
+    );
+
+    return;
+  }
+
+  const tbody =
+    $("tableBody");
+
+  tbody.innerHTML =
+    '<tr><td colspan="7" class="empty">در حال دریافت اطلاعات...</td></tr>';
+
+  try {
+
+    const result =
+      await supabaseClient
+        .from("appointments")
+        .select("*")
+        .order("id", {
+          ascending: false
+        })
+        .limit(500);
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    appointmentRows =
+      result.data || [];
+
+    renderRows(
+      appointmentRows
+    );
+
+  } catch (error) {
+
+    tbody.innerHTML =
+      '<tr><td colspan="7" class="empty">❌ خطا در دریافت اطلاعات</td></tr>';
+
+    showMainMessage(
+      "خطا در دریافت نوبت‌ها: " +
+      error.message,
+      "error"
+    );
+  }
+}
+
+
+/* =========================
+   RENDER
+========================= */
+
+function renderRows(rows) {
+
+  const tbody =
+    $("tableBody");
+
+  tbody.innerHTML = "";
+
+  if (!rows.length) {
+
+    tbody.innerHTML =
+      '<tr><td colspan="7" class="empty">هنوز نوبتی ثبت نشده است.</td></tr>';
+
+    return;
+  }
+
+  rows.forEach(function(row) {
+
+    const tr =
+      document.createElement("tr");
+
+    addCell(
+      tr,
+      row.serial
+    );
+
+    addCell(
+      tr,
+      row.plate_number
+    );
+
+    const statusCell =
+      document.createElement("td");
+
+    const badge =
+      document.createElement("span");
+
+    badge.className =
+      "badge";
+
+    badge.textContent =
+      row.status || "-";
+
+    statusCell.appendChild(
+      badge
+    );
+
+    tr.appendChild(
+      statusCell
+    );
+
+    addCell(
+      tr,
+      row.border_name
+    );
+
+    addCell(
+      tr,
+      row.queue_type
+    );
+
+    addCell(
+      tr,
+      row.received_at
+    );
+
+
+    const actionCell =
+      document.createElement("td");
+
+
+    const editButton =
+      document.createElement("button");
+
+    editButton.className =
+      "secondary";
+
+    editButton.textContent =
+      "✏️ ویرایش";
+
+    editButton.onclick =
+      function() {
+
+        editAppointment(row);
+
+      };
+
+
+    const deleteButton =
+      document.createElement("button");
+
+    deleteButton.className =
+      "danger";
+
+    deleteButton.textContent =
+      "🗑 حذف";
+
+    deleteButton.style.marginRight =
+      "6px";
+
+    deleteButton.onclick =
+      function() {
+
+        deleteAppointment(row.id);
+
+      };
+
+
+    actionCell.appendChild(
+      editButton
+    );
+
+    actionCell.appendChild(
+      deleteButton
+    );
+
+    tr.appendChild(
+      actionCell
+    );
+
+    tbody.appendChild(
+      tr
+    );
+
+  });
+}
+
+
+/* =========================
+   CELL
+========================= */
+
+function addCell(row, value) {
+
+  const td =
+    document.createElement("td");
+
+  td.textContent =
+    value == null
+      ? "-"
+      : value;
+
+  row.appendChild(td);
+}
+
+
+/* =========================
+   DELETE
+========================= */
+
+async function deleteAppointment(id) {
+
+  if (!id) {
+
+    showMainMessage(
+      "شناسه نوبت پیدا نشد.",
+      "error"
+    );
+
+    return;
+  }
+
+  const confirmed =
+    confirm(
+      "آیا مطمئن هستید که این نوبت حذف شود؟"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+
+    const result =
+      await supabaseClient
+        .from("appointments")
+        .delete()
+        .eq("id", id);
+
+    if (result.error) {
+      throw result.error;
+    }
+
+    showMainMessage(
+      "✅ نوبت با موفقیت حذف شد.",
+      "ok"
+    );
+
+    await loadAppointments();
+
+  } catch (error) {
+
+    showMainMessage(
+      "❌ خطا در حذف نوبت: " +
+      error.message,
+      "error"
+    );
+  }
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+function filterRows() {
+
+  const query =
+    $("search")
+      .value
+      .trim()
+      .toLowerCase();
+
+  if (!query) {
+
+    renderRows(
+      appointmentRows
+    );
+
+    return;
+  }
+
+  const filtered =
+    appointmentRows.filter(
+      function(row) {
+
+        const serial =
+          String(
+            row.serial || ""
+          ).toLowerCase();
+
+        const plate =
+          String(
+            row.plate_number || ""
+          ).toLowerCase();
+
+        return (
+          serial.includes(query) ||
+          plate.includes(query)
+        );
+      }
+    );
+
+  renderRows(filtered);
+}
+
+
+/* =========================
+   ENTER KEY LOGIN
+========================= */
+
+document.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (
+      event.key === "Enter" &&
+      !$("loginBox")
+        .classList.contains("hidden")
+    ) {
+
+      login();
+
+    }
+
+  }
+);
+
+
+/* =========================
+   START
+========================= */
+
+window.addEventListener(
+  "load",
+  function() {
+
+    init();
+
+  }
+);
+
+</script>
+
+</body>
+</html>
