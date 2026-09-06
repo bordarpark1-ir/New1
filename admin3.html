@@ -1,1 +1,296 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مدیریت نوبت‌ها</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<style>
+body{font-family:Tahoma;background:#f3f4f6;margin:0;padding:15px}
+.box{max-width:900px;margin:auto;background:white;padding:20px;border-radius:15px}
+input,button{padding:10px;margin:5px;border-radius:8px;border:1px solid #ccc}
+button{cursor:pointer;background:#2563eb;color:white}
+.del{background:#dc2626}
+.qr{background:#16a34a}
+.item{border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:10px}
+#panel{display:none}
+#qrbox{text-align:center;padding:20px}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>🔐 پنل مدیریت نوبت‌ها</h2>
+
+<div id="login">
+<input id="email" type="email" placeholder="ایمیل مدیر">
+<input id="pass" type="password" placeholder="رمز عبور">
+<button onclick="login()">ورود</button>
+<p id="msg"></p>
+</div>
+
+<div id="panel">
+
+<button onclick="logout()">خروج</button>
+
+<h3>➕ ثبت نوبت</h3>
+
+<input id="serial" placeholder="شماره نوبت">
+<input id="border_name" placeholder="نام مرز">
+<input id="queue_type" placeholder="نوع صف">
+<input id="plate_number" placeholder="شماره پلاک">
+<input id="appointment_type" placeholder="نوع نوبت">
+<input id="status" placeholder="وضعیت">
+<input id="terminal" placeholder="ترمینال">
+<input id="service_number" placeholder="شماره خدمت">
+
+<br>
+
+<button onclick="save()">💾 ذخیره نوبت</button>
+<button onclick="clearForm()">پاک کردن</button>
+
+<hr>
+
+<input id="search" placeholder="🔎 جستجوی شماره نوبت" oninput="load()">
+
+<div id="list"></div>
+
+</div>
+</div>
+
+<div id="qrModal" style="display:none;position:fixed;inset:0;background:#0008">
+<div style="background:white;max-width:350px;margin:70px auto;padding:20px;border-radius:15px;text-align:center">
+<h3>QR نوبت</h3>
+<div id="qrbox"></div>
+<p id="qrtext"></p>
+<button onclick="printQR()">🖨 چاپ</button>
+<button onclick="closeQR()">بستن</button>
+</div>
+</div>
+
+<script>
+let db,editing=null,qrSerial="";
+
+window.onload=async()=>{
+ db=window.supabase.createClient(
+   window.SUPABASE_URL,
+   window.SUPABASE_ANON_KEY
+ );
+
+ const {data:{session}}=await db.auth.getSession();
+
+ if(session){
+   showPanel();
+ }else{
+   document.getElementById("login").style.display="block";
+ }
+};
+
+async function login(){
+ const email=document.getElementById("email").value;
+ const pass=document.getElementById("pass").value;
+
+ const {error}=await db.auth.signInWithPassword({
+   email:email,
+   password:pass
+ });
+
+ if(error){
+   document.getElementById("msg").innerText="❌ "+error.message;
+   return;
+ }
+
+ showPanel();
+}
+
+async function logout(){
+ await db.auth.signOut();
+ location.reload();
+}
+
+function showPanel(){
+ document.getElementById("login").style.display="none";
+ document.getElementById("panel").style.display="block";
+ load();
+}
+
+async function load(){
+
+ let q=document.getElementById("search").value.trim();
+
+ let query=db.from("appointments")
+   .select("*")
+   .order("serial",{ascending:false});
+
+ if(q) query=query.ilike("serial","%"+q+"%");
+
+ const {data,error}=await query;
+
+ if(error){
+   document.getElementById("list").innerHTML="❌ "+error.message;
+   return;
+ }
+
+ document.getElementById("list").innerHTML=data.map(x=>`
+ <div class="item">
+ <b>نوبت: ${x.serial||""}</b><br>
+ مرز: ${x.border_name||""}<br>
+ صف: ${x.queue_type||""}<br>
+ پلاک: ${x.plate_number||""}<br>
+ نوع نوبت: ${x.appointment_type||""}<br>
+ وضعیت: ${x.status||""}<br>
+ ترمینال: ${x.terminal||""}<br>
+ خدمت: ${x.service_number||""}<br><br>
+
+ <button onclick='edit(${JSON.stringify(x)})'>✏️ ویرایش</button>
+ <button class="del" onclick="del('${x.serial}')">🗑 حذف</button>
+ <button class="qr" onclick="makeQR('${x.serial}')">📱 QR</button>
+ </div>
+ `).join("");
+}
+
+async function save(){
+
+ const obj={
+  serial:v("serial"),
+  border_name:v("border_name"),
+  queue_type:v("queue_type"),
+  plate_number:v("plate_number"),
+  appointment_type:v("appointment_type"),
+  status:v("status"),
+  terminal:v("terminal"),
+  service_number:v("service_number")
+ };
+
+ if(!obj.serial){
+   alert("شماره نوبت را وارد کنید");
+   return;
+ }
+
+ let result;
+
+ if(editing){
+   result=await db.from("appointments")
+    .update(obj)
+    .eq("serial",editing);
+ }else{
+   result=await db.from("appointments")
+    .insert(obj);
+ }
+
+ if(result.error){
+   alert("خطا: "+result.error.message);
+   return;
+ }
+
+ alert("✅ ذخیره شد");
+ editing=null;
+ clearForm();
+ load();
+}
+
+function edit(x){
+
+ editing=x.serial;
+
+ for(let k of [
+  "serial","border_name","queue_type","plate_number",
+  "appointment_type","status","terminal","service_number"
+ ]){
+   document.getElementById(k).value=x[k]||"";
+ }
+
+ document.getElementById("serial").disabled=true;
+}
+
+async function del(serial){
+
+ if(!confirm("این نوبت حذف شود؟"))return;
+
+ const {error}=await db
+  .from("appointments")
+  .delete()
+  .eq("serial",serial);
+
+ if(error){
+   alert("خطا: "+error.message);
+   return;
+ }
+
+ load();
+}
+
+function clearForm(){
+
+ editing=null;
+ document.getElementById("serial").disabled=false;
+
+ [
+  "serial","border_name","queue_type","plate_number",
+  "appointment_type","status","terminal","service_number"
+ ].forEach(x=>document.getElementById(x).value="");
+}
+
+function v(id){
+ return document.getElementById(id).value.trim();
+}
+
+function makeQR(serial){
+
+ qrSerial=serial;
+
+ document.getElementById("qrModal").style.display="block";
+ document.getElementById("qrbox").innerHTML="";
+
+ const url=window.location.origin+
+ "/New1/?serial="+encodeURIComponent(serial);
+
+ new QRCode(document.getElementById("qrbox"),{
+   text:url,
+   width:220,
+   height:220,
+   correctLevel:QRCode.CorrectLevel.H
+ });
+
+ document.getElementById("qrtext").innerText=
+ "شماره نوبت: "+serial;
+}
+
+function closeQR(){
+ document.getElementById("qrModal").style.display="none";
+}
+
+function printQR(){
+
+ const content=document.getElementById("qrbox").innerHTML;
+ const text=document.getElementById("qrtext").innerText;
+
+ const w=window.open("","_blank");
+
+ w.document.write(`
+ <html dir="rtl">
+ <body style="text-align:center;font-family:Tahoma">
+ <h2>QR نوبت</h2>
+ ${content}
+ <h3>${text}</h3>
+ <script>
+ window.onload=function(){
+   window.print();
+ }
+ <\/script>
+ </body>
+ </html>
+ `);
+
+ w.document.close();
+}
+</script>
+
+</body>
+</html>
