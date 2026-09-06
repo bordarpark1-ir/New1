@@ -11,190 +11,118 @@
 
 <style>
 *{
-  box-sizing:border-box;
+    box-sizing:border-box;
 }
 
 body{
-  margin:0;
-  font-family:Tahoma,Arial,sans-serif;
-  background:#f3f6f9;
-  color:#222;
+    margin:0;
+    font-family:Tahoma,Arial,sans-serif;
+    background:#f4f7fb;
+    color:#222;
 }
 
 .header{
-  background:linear-gradient(135deg,#00695c,#00897b);
-  color:white;
-  padding:28px 15px;
-  text-align:center;
-  box-shadow:0 3px 10px rgba(0,0,0,.15);
+    background:linear-gradient(135deg,#087f5b,#12b886);
+    color:white;
+    padding:28px 15px;
+    text-align:center;
 }
 
 .header h1{
-  margin:0;
-  font-size:28px;
-  font-weight:bold;
+    margin:0;
+    font-size:28px;
 }
 
 .header p{
-  margin:10px 0 0;
-  font-size:15px;
-  opacity:.95;
+    margin:10px 0 0;
+    font-size:15px;
 }
 
 .container{
-  max-width:650px;
-  margin:35px auto;
-  padding:0 15px;
+    max-width:700px;
+    margin:30px auto;
+    padding:0 15px;
+}
+
+.card{
+    background:white;
+    border-radius:18px;
+    padding:22px;
+    box-shadow:0 5px 25px rgba(0,0,0,.08);
 }
 
 .search-box{
-  background:white;
-  padding:22px;
-  border-radius:15px;
-  box-shadow:0 4px 15px rgba(0,0,0,.08);
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
 }
 
-.search-box label{
-  display:block;
-  margin-bottom:10px;
-  font-weight:bold;
-  color:#444;
+.search-box input{
+    flex:1;
+    padding:14px;
+    border:1px solid #ddd;
+    border-radius:12px;
+    font-size:16px;
+    outline:none;
 }
 
-.input-row{
-  display:flex;
-  gap:10px;
-}
-
-input{
-  flex:1;
-  height:48px;
-  border:1px solid #ddd;
-  border-radius:10px;
-  padding:0 15px;
-  font-size:16px;
-  outline:none;
-  direction:ltr;
-  text-align:center;
-}
-
-input:focus{
-  border-color:#00897b;
-}
-
-button{
-  height:48px;
-  border:none;
-  border-radius:10px;
-  padding:0 22px;
-  background:#00897b;
-  color:white;
-  font-size:16px;
-  cursor:pointer;
-  font-family:Tahoma,Arial,sans-serif;
-}
-
-button:hover{
-  background:#00695c;
-}
-
-.message{
-  margin-top:20px;
-  padding:15px;
-  border-radius:10px;
-  text-align:center;
-  display:none;
-  font-size:15px;
-}
-
-.error{
-  background:#ffebee;
-  color:#c62828;
-}
-
-.loading{
-  background:#e0f2f1;
-  color:#00695c;
+.search-box button{
+    border:0;
+    background:#087f5b;
+    color:white;
+    padding:0 22px;
+    border-radius:12px;
+    font-size:16px;
+    cursor:pointer;
 }
 
 .result{
-  display:none;
-  margin-top:22px;
-  background:white;
-  border-radius:15px;
-  overflow:hidden;
-  box-shadow:0 4px 15px rgba(0,0,0,.08);
-}
-
-.result-title{
-  background:#00897b;
-  color:white;
-  padding:17px;
-  text-align:center;
-  font-size:19px;
-  font-weight:bold;
-}
-
-.info{
-  padding:10px 18px 18px;
+    display:none;
 }
 
 .row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-  padding:14px 5px;
-  border-bottom:1px solid #eee;
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+    padding:13px 5px;
+    border-bottom:1px solid #eee;
 }
 
 .row:last-child{
-  border-bottom:none;
+    border-bottom:0;
 }
 
 .label{
-  color:#666;
-  font-weight:bold;
-  font-size:14px;
+    color:#666;
+    font-weight:bold;
 }
 
 .value{
-  color:#222;
-  font-size:14px;
-  text-align:left;
-  direction:rtl;
-  word-break:break-word;
+    color:#111;
+    text-align:left;
+    word-break:break-word;
 }
 
-.footer{
-  text-align:center;
-  color:#888;
-  font-size:12px;
-  padding:20px;
+.message{
+    display:none;
+    padding:15px;
+    border-radius:12px;
+    margin-top:15px;
+    text-align:center;
+    background:#fff3cd;
+    color:#856404;
 }
 
-@media(max-width:500px){
-
-  .header h1{
-    font-size:23px;
-  }
-
-  .input-row{
-    flex-direction:column;
-  }
-
-  button{
-    width:100%;
-  }
-
-  .row{
-    align-items:flex-start;
-  }
-
-  .value{
-    max-width:55%;
-  }
-
+.debug{
+    display:none;
+    margin-top:15px;
+    padding:12px;
+    background:#f1f3f5;
+    border-radius:10px;
+    font-size:12px;
+    direction:ltr;
+    text-align:left;
+    word-break:break-all;
 }
 </style>
 </head>
@@ -202,548 +130,373 @@ button:hover{
 <body>
 
 <div class="header">
-  <h1>استعلام نوبت</h1>
-  <p>سامانه استعلام وضعیت نوبت خودرو</p>
+    <h1>استعلام نوبت</h1>
+    <p>سامانه استعلام وضعیت نوبت خودرو</p>
 </div>
-
 
 <div class="container">
 
-  <div class="search-box">
+    <div class="card">
 
-    <label for="serialInput">
-      شماره سریال نوبت
-    </label>
+        <div class="search-box">
+            <input
+                type="text"
+                id="serial"
+                placeholder="شماره سریال نوبت را وارد کنید"
+            >
 
-    <div class="input-row">
+            <button onclick="searchAppointment()">
+                استعلام
+            </button>
+        </div>
 
-      <input
-        id="serialInput"
-        type="text"
-        placeholder="شماره سریال را وارد کنید"
-        autocomplete="off"
-      >
+        <div id="message" class="message"></div>
 
-      <button id="searchBtn">
-        استعلام
-      </button>
+        <div id="debug" class="debug"></div>
 
-    </div>
+        <div id="result" class="result">
 
-  </div>
+            <div class="row">
+                <span class="label">شماره سریال</span>
+                <span class="value" id="r_serial">-</span>
+            </div>
 
+            <div class="row">
+                <span class="label">مرز</span>
+                <span class="value" id="r_border_name">-</span>
+            </div>
 
-  <div id="loading" class="message loading">
-    در حال دریافت اطلاعات...
-  </div>
+            <div class="row">
+                <span class="label">نوع صف</span>
+                <span class="value" id="r_queue_type">-</span>
+            </div>
 
+            <div class="row">
+                <span class="label">شماره پلاک</span>
+                <span class="value" id="r_plate_number">-</span>
+            </div>
 
-  <div id="error" class="message error">
-    نوبت مورد نظر پیدا نشد.
-  </div>
+            <div class="row">
+                <span class="label">نوع نوبت</span>
+                <span class="value" id="r_appointment_type">-</span>
+            </div>
 
+            <div class="row">
+                <span class="label">زمان دریافت نوبت</span>
+                <span class="value" id="r_received_at">-</span>
+            </div>
 
-  <div id="result" class="result">
+            <div class="row">
+                <span class="label">وضعیت</span>
+                <span class="value" id="r_status">-</span>
+            </div>
 
-    <div class="result-title">
-      اطلاعات نوبت خودرو
-    </div>
+            <div class="row">
+                <span class="label">ترمینال</span>
+                <span class="value" id="r_terminal">-</span>
+            </div>
 
-    <div class="info">
+            <div class="row">
+                <span class="label">شماره خدمت</span>
+                <span class="value" id="r_service_number">-</span>
+            </div>
 
-      <div class="row">
-        <span class="label">شماره سریال</span>
-        <span class="value" id="serial">—</span>
-      </div>
+            <div class="row">
+                <span class="label">ورود به ترمینال</span>
+                <span class="value" id="r_entered_terminal_at">-</span>
+            </div>
 
-      <div class="row">
-        <span class="label">نام مرز</span>
-        <span class="value" id="border_name">—</span>
-      </div>
+            <div class="row">
+                <span class="label">فراخوانی</span>
+                <span class="value" id="r_called_at">-</span>
+            </div>
 
-      <div class="row">
-        <span class="label">نوع صف</span>
-        <span class="value" id="queue_type">—</span>
-      </div>
+            <div class="row">
+                <span class="label">خروج از ترمینال</span>
+                <span class="value" id="r_exited_terminal_at">-</span>
+            </div>
 
-      <div class="row">
-        <span class="label">شماره پلاک</span>
-        <span class="value" id="plate_number">—</span>
-      </div>
+            <div class="row">
+                <span class="label">اجازه گمرک</span>
+                <span class="value" id="r_allowed_customs_at">-</span>
+            </div>
 
-      <div class="row">
-        <span class="label">نوع نوبت</span>
-        <span class="value" id="appointment_type">—</span>
-      </div>
-
-      <div class="row">
-        <span class="label">تاریخ دریافت نوبت</span>
-        <span class="value" id="received_at">—</span>
-      </div>
-
-      <div class="row">
-        <span class="label">وضعیت</span>
-        <span class="value" id="status">—</span>
-      </div>
-
-      <div class="row">
-        <span class="label">ترمینال</span>
-        <span class="value" id="terminal">—</span>
-      </div>
-
-      <div class="row">
-        <span class="label">شماره سرویس</span>
-        <span class="value" id="service_number">—</span>
-      </div>
-
-      <div class="row">
-        <span class="label">ورود به ترمینال</span>
-        <span class="value" id="entered_terminal_at">—</span>
-      </div>
-
-      <div class="row">
-        <span class="label">فراخوانی</span>
-        <span class="value" id="called_at">—</span>
-      </div>
-
-      <div class="row">
-        <span class="label">خروج از ترمینال</span>
-        <span class="value" id="exited_terminal_at">—</span>
-      </div>
-
-      <div class="row">
-        <span class="label">مجاز به گمرک</span>
-        <span class="value" id="allowed_customs_at">—</span>
-      </div>
+        </div>
 
     </div>
-
-  </div>
 
 </div>
-
-
-<div class="footer">
-  سامانه استعلام وضعیت نوبت خودرو
-</div>
-
 
 <script>
 
-/* =========================================
-   اتصال به Supabase
-========================================= */
-
-const supabaseClient =
-  supabase.createClient(
+const supabaseClient = window.supabase.createClient(
     window.SUPABASE_URL,
     window.SUPABASE_ANON_KEY
-  );
+);
 
 
-/* =========================================
-   عناصر صفحه
-========================================= */
+/* نمایش پیام */
 
-const loading =
-  document.getElementById("loading");
+function showMessage(text){
+    const box = document.getElementById("message");
 
-const errorBox =
-  document.getElementById("error");
-
-const result =
-  document.getElementById("result");
-
-const serialInput =
-  document.getElementById("serialInput");
-
-const searchBtn =
-  document.getElementById("searchBtn");
-
-
-/* =========================================
-   مخفی کردن پیام‌ها
-========================================= */
-
-function hideAll(){
-
-  loading.style.display = "none";
-
-  errorBox.style.display = "none";
-
-  result.style.display = "none";
-
+    box.style.display = "block";
+    box.textContent = text;
 }
 
 
-/* =========================================
-   نمایش خطا
-========================================= */
+/* پاک کردن پیام */
 
-function showError(text){
-
-  loading.style.display = "none";
-
-  result.style.display = "none";
-
-  errorBox.textContent = text;
-
-  errorBox.style.display = "block";
-
+function hideMessage(){
+    document.getElementById("message").style.display = "none";
 }
 
 
-/* =========================================
-   مقدار نمایش
-========================================= */
+/* نمایش اطلاعات */
 
-function displayValue(value){
+function showResult(row){
 
-  if(
-    value === null ||
-    value === undefined ||
-    value === ""
-  ){
+    document.getElementById("result").style.display = "block";
 
-    return "—";
+    document.getElementById("r_serial").textContent =
+        row.serial ?? "-";
 
-  }
+    document.getElementById("r_border_name").textContent =
+        row.border_name ?? "-";
 
-  return String(value);
+    document.getElementById("r_queue_type").textContent =
+        row.queue_type ?? "-";
 
+    document.getElementById("r_plate_number").textContent =
+        row.plate_number ?? "-";
+
+    document.getElementById("r_appointment_type").textContent =
+        row.appointment_type ?? "-";
+
+    document.getElementById("r_received_at").textContent =
+        row.received_at ?? "-";
+
+    document.getElementById("r_status").textContent =
+        row.status ?? "-";
+
+    document.getElementById("r_terminal").textContent =
+        row.terminal ?? "-";
+
+    document.getElementById("r_service_number").textContent =
+        row.service_number ?? "-";
+
+    document.getElementById("r_entered_terminal_at").textContent =
+        row.entered_terminal_at ?? "-";
+
+    document.getElementById("r_called_at").textContent =
+        row.called_at ?? "-";
+
+    document.getElementById("r_exited_terminal_at").textContent =
+        row.exited_terminal_at ?? "-";
+
+    document.getElementById("r_allowed_customs_at").textContent =
+        row.allowed_customs_at ?? "-";
 }
 
 
-/* =========================================
-   نمایش اطلاعات نوبت
-========================================= */
-
-function displayAppointment(row){
-
-  document.getElementById("serial").textContent =
-    displayValue(row.serial);
-
-  document.getElementById("border_name").textContent =
-    displayValue(row.border_name);
-
-  document.getElementById("queue_type").textContent =
-    displayValue(row.queue_type);
-
-  document.getElementById("plate_number").textContent =
-    displayValue(row.plate_number);
-
-  document.getElementById("appointment_type").textContent =
-    displayValue(row.appointment_type);
-
-  document.getElementById("received_at").textContent =
-    displayValue(row.received_at);
-
-  document.getElementById("status").textContent =
-    displayValue(row.status);
-
-  document.getElementById("terminal").textContent =
-    displayValue(row.terminal);
-
-  document.getElementById("service_number").textContent =
-    displayValue(row.service_number);
-
-  document.getElementById("entered_terminal_at").textContent =
-    displayValue(row.entered_terminal_at);
-
-  document.getElementById("called_at").textContent =
-    displayValue(row.called_at);
-
-  document.getElementById("exited_terminal_at").textContent =
-    displayValue(row.exited_terminal_at);
-
-  document.getElementById("allowed_customs_at").textContent =
-    displayValue(row.allowed_customs_at);
-
-  loading.style.display = "none";
-
-  errorBox.style.display = "none";
-
-  result.style.display = "block";
-
-}
-
-
-/* =========================================
-   جستجوی نوبت
-========================================= */
+/* استعلام */
 
 async function searchAppointment(){
 
-  hideAll();
+    hideMessage();
 
-  loading.style.display = "block";
+    document.getElementById("result").style.display = "none";
 
+    const url = new URL(window.location.href);
 
-  const urlParams =
-    new URLSearchParams(
-      window.location.search
-    );
+    const idFromUrl = url.searchParams.get("id");
+    const serialFromUrl = url.searchParams.get("serial");
 
-
-  /*
-    ID از داخل QR
-
-    مثال:
-
-    ?id=5&serial=150
-  */
-
-  const qrId =
-    urlParams.get("id");
+    const manualSerial =
+        document.getElementById("serial").value.trim();
 
 
-  /*
-    سریال موجود در QR
-  */
-
-  const qrSerial =
-    urlParams.get("serial");
-
-
-  /*
-    سریال واردشده توسط کاربر
-  */
-
-  const manualSerial =
-    serialInput.value.trim();
-
-
-  try{
+    console.log("QR ID:", idFromUrl);
+    console.log("QR Serial:", serialFromUrl);
 
 
     let row = null;
 
 
-    /* =====================================
-       حالت QR
+    /* =====================================================
+       اگر QR دارای ID باشد
+       فقط و فقط بر اساس ID جستجو می‌کنیم
+       ===================================================== */
 
-       اگر ID وجود داشته باشد،
-       فقط ID ملاک است.
+    if(idFromUrl !== null && idFromUrl !== ""){
 
-       سریال کاملاً نادیده گرفته می‌شود.
-    ===================================== */
+        const numericId = Number(idFromUrl);
 
-    if(
-      qrId !== null &&
-      qrId !== ""
-    ){
-
-      console.log(
-        "Searching appointment by ID:",
-        qrId
-      );
+        if(!Number.isInteger(numericId)){
+            showMessage("شناسه QR معتبر نیست.");
+            return;
+        }
 
 
-      const response =
-        await supabaseClient
-          .from("appointments")
-          .select("*")
-          .eq("id", qrId)
-          .maybeSingle();
+        const { data, error } =
+            await supabaseClient
+                .from("appointments")
+                .select("*")
+                .eq("id", numericId)
+                .limit(1);
 
 
-      if(response.error){
-
-        console.error(
-          response.error
-        );
-
-        showError(
-          "خطا در دریافت اطلاعات نوبت."
-        );
-
-        return;
-
-      }
+        console.log("Supabase ID result:", data);
+        console.log("Supabase ID error:", error);
 
 
-      row = response.data;
+        if(error){
+
+            showMessage(
+                "خطا در ارتباط با اطلاعات نوبت: " +
+                error.message
+            );
+
+            return;
+        }
+
+
+        if(!data || data.length === 0){
+
+            showMessage(
+                "برای این QR کد، نوبتی با این شناسه پیدا نشد."
+            );
+
+            return;
+        }
+
+
+        row = data[0];
 
     }
 
 
-    /* =====================================
-       حالت جستجوی دستی
-
-       اگر QR ID وجود نداشت،
-       با serial جستجو می‌کنیم.
-    ===================================== */
+    /* =====================================================
+       اگر ID وجود نداشت، با سریال جستجو می‌کنیم
+       ===================================================== */
 
     else{
 
-      const serial =
-        manualSerial || qrSerial;
+        const serial =
+            manualSerial || serialFromUrl || "";
 
 
-      if(!serial){
+        if(!serial){
 
-        showError(
-          "لطفاً شماره سریال نوبت را وارد کنید."
-        );
+            showMessage(
+                "لطفاً شماره سریال نوبت را وارد کنید."
+            );
 
-        return;
-
-      }
-
-
-      console.log(
-        "Searching appointment by serial:",
-        serial
-      );
+            return;
+        }
 
 
-      const response =
-        await supabaseClient
-          .from("appointments")
-          .select("*")
-          .eq("serial", serial)
-          .limit(1)
-          .maybeSingle();
+        const { data, error } =
+            await supabaseClient
+                .from("appointments")
+                .select("*")
+                .eq("serial", serial)
+                .limit(1);
 
 
-      if(response.error){
-
-        console.error(
-          response.error
-        );
-
-        showError(
-          "خطا در دریافت اطلاعات نوبت."
-        );
-
-        return;
-
-      }
+        console.log("Supabase serial result:", data);
+        console.log("Supabase serial error:", error);
 
 
-      row = response.data;
+        if(error){
 
-    }
+            showMessage(
+                "خطا در ارتباط با اطلاعات نوبت: " +
+                error.message
+            );
+
+            return;
+        }
 
 
-    /* =====================================
-       اگر رکورد پیدا نشد
-    ===================================== */
+        if(!data || data.length === 0){
 
-    if(!row){
+            showMessage(
+                "نوبتی با این شماره سریال پیدا نشد."
+            );
 
-      showError(
-        "نوبت مورد نظر پیدا نشد."
-      );
+            return;
+        }
 
-      return;
+
+        row = data[0];
 
     }
 
 
-    /* =====================================
-       نمایش اطلاعات واقعی همان رکورد
-    ===================================== */
+    /* =====================================================
+       اطلاعات پیدا شد
+       ===================================================== */
 
-    console.log(
-      "Appointment found:",
-      row
-    );
+    if(row){
 
+        console.log("FINAL ROW:", row);
 
-    displayAppointment(row);
+        showResult(row);
 
+        /*
+        برای تشخیص مشکل QR،
+        ID واقعی رکورد را در صفحه ثبت می‌کنیم.
+        */
 
-  }
-  catch(err){
+        const debug =
+            document.getElementById("debug");
 
-    console.error(
-      "Unexpected error:",
-      err
-    );
+        debug.style.display = "block";
 
-    showError(
-      "خطایی در ارتباط با سامانه رخ داد."
-    );
-
-  }
+        debug.textContent =
+            "QR ID = " +
+            (idFromUrl || "ندارد") +
+            " | DATABASE ID = " +
+            (row.id ?? "ندارد") +
+            " | SERIAL = " +
+            (row.serial ?? "ندارد");
+    }
 
 }
 
 
-/* =========================================
-   کلیک روی دکمه
-========================================= */
+/* =====================================================
+   اجرای خودکار هنگام باز شدن QR
+   ===================================================== */
 
-searchBtn.addEventListener(
-  "click",
-  searchAppointment
-);
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
 
+        const url =
+            new URL(window.location.href);
 
-/* =========================================
-   Enter
-========================================= */
+        const id =
+            url.searchParams.get("id");
 
-serialInput.addEventListener(
-  "keydown",
-  function(event){
-
-    if(event.key === "Enter"){
-
-      searchAppointment();
-
-    }
-
-  }
-);
+        const serial =
+            url.searchParams.get("serial");
 
 
-/* =========================================
-   باز شدن صفحه با QR
-========================================= */
+        if(serial){
 
-window.addEventListener(
-  "DOMContentLoaded",
-  function(){
-
-    const params =
-      new URLSearchParams(
-        window.location.search
-      );
+            document.getElementById("serial").value =
+                serial;
+        }
 
 
-    const id =
-      params.get("id");
+        if(id){
 
-
-    const serial =
-      params.get("serial");
-
-
-    /*
-      سریال QR را داخل کادر می‌گذاریم
-    */
-
-    if(serial){
-
-      serialInput.value = serial;
+            searchAppointment();
+        }
 
     }
-
-
-    /*
-      اگر QR دارای ID باشد،
-      همان لحظه نوبت را نمایش بده.
-    */
-
-    if(id){
-
-      searchAppointment();
-
-    }
-
-  }
 );
 
 </script>
