@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
 <title>پنل مدیریت</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -216,216 +215,248 @@ th{
   border-radius:12px
 }
 
+/* رسیدها */
+
 .receipt{
   margin:auto;
   color:#111;
   background:#fff;
-  direction:rtl
+  direction:rtl;
+  font-family:Calibri,"Noto Naskh Arabic",Tahoma,Arial,sans-serif
 }
 
-/* =========================
-   رسید بادپا
-========================= */
+/* بادپا */
 
 .receipt-badpa{
-  width:390px;
-  border:1px solid #111;
-  padding:10px;
-  font-family:Tahoma,Arial,sans-serif;
-  font-size:11px
+  width:3in;
+  min-height:8.5in;
+  font-size:12pt;
+  line-height:1.5
+}
+
+.badpa-box{
+  border:1px solid #111
 }
 
 .badpa-head{
   text-align:center;
-  font-weight:bold;
-  font-size:16px;
-  margin-bottom:7px
-}
-
-.badpa-sub{
-  text-align:center;
-  margin-bottom:7px
+  font-weight:700;
+  font-size:14pt;
+  line-height:1.15;
+  padding:5px 2px;
+  border-bottom:1px solid #111
 }
 
 .badpa-info{
-  border-top:1px solid #111;
-  border-right:1px solid #111
+  padding:5px 8px
 }
 
-.badpa-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  border-bottom:1px solid #111
+.badpa-line{
+  min-height:25px;
+  text-align:right;
+  white-space:pre-wrap
 }
 
-.badpa-cell{
-  padding:5px;
-  border-left:1px solid #111;
-  min-height:28px
+.badpa-transit{
+  text-align:center;
+  font-weight:700;
+  font-size:14pt;
+  line-height:1.15
 }
 
-.badpa-cell:last-child{
-  border-left:0
+.badpa-line b{
+  font-weight:700
+}
+
+.badpa-plate{
+  font-size:14pt;
+  font-weight:700
 }
 
 .badpa-money{
-  margin-top:7px;
-  border:1px solid #111
+  border:2px solid #111;
+  border-radius:16px;
+  margin-top:8px;
+  padding:7px 8px
 }
 
 .badpa-money-row{
-  display:grid;
-  grid-template-columns:1fr 120px;
-  border-bottom:1px solid #111
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  line-height:1.75
 }
 
 .badpa-money-row:last-child{
-  border-bottom:0
+  border-top:2px solid #111;
+  margin-top:3px;
+  padding-top:2px;
+  font-weight:700;
+  font-size:14pt
 }
 
-.badpa-money-row div{
-  padding:5px
-}
-
-.badpa-money-row div:last-child{
-  border-right:1px solid #111;
-  text-align:center
+.badpa-cargo,
+.badpa-note{
+  border:2px solid #111;
+  border-radius:16px;
+  text-align:center;
+  font-weight:700;
+  margin-top:8px;
+  padding:7px 6px
 }
 
 .badpa-cargo{
-  text-align:center;
-  font-weight:bold;
-  margin:8px 0
+  font-size:16pt;
+  line-height:1.25
 }
 
 .badpa-note{
-  text-align:center;
-  line-height:1.9;
-  margin-top:7px;
-  white-space:pre-line
+  font-size:10pt;
+  line-height:1.55
 }
 
-.badpa-qr{
-  display:flex;
-  justify-content:center;
-  margin-top:8px
+.badpa-qrpage{
+  width:3in;
+  height:8.5in;
+  text-align:center;
+  padding-top:.35in;
+  page-break-before:always
+}
+
+.badpa-qrpage img,
+.badpa-qrpage canvas{
+  width:1.8in!important;
+  height:1.8in!important
 }
 
 .badpa-code{
   text-align:center;
-  font-size:10px;
-  margin-top:5px;
+  font-size:12pt;
+  font-weight:700;
+  margin-top:12px;
   word-break:break-all
 }
 
-/* =========================
-   رسید سنوار
-========================= */
+/* سنوار */
 
 .receipt-senvar{
-  width:390px;
-  border:1px solid #111;
-  padding:9px;
-  font-family:Tahoma,Arial,sans-serif;
-  font-size:11px
+  width:3in;
+  min-height:10.5in;
+  font-size:12pt;
+  line-height:1.15
 }
 
-.senvar-top{
-  text-align:center;
-  font-weight:bold;
-  font-size:16px;
-  margin-bottom:7px
+.senvar-topbox{
+  border:2px solid #111;
+  border-radius:16px;
+  min-height:2.15in;
+  padding:5px 8px;
+  margin-bottom:20px;
+  position:relative
+}
+
+.senvar-topbox .big{
+  font-size:14pt;
+  font-weight:700
+}
+
+.senvar-topbox .top-code{
+  font-size:16pt;
+  font-weight:700;
+  position:absolute;
+  right:18px;
+  bottom:18px
 }
 
 .senvar-plate{
-  border:1px solid #111;
-  padding:7px;
-  text-align:center;
-  font-size:14px;
-  font-weight:bold
-}
-
-.senvar-meta{
-  border:1px solid #111;
-  border-top:0
-}
-
-.senvar-meta-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
+  padding:4px 8px;
+  text-align:right;
+  font-size:14pt;
+  font-weight:700;
   border-bottom:1px solid #111
 }
 
-.senvar-meta-row:last-child{
-  border-bottom:0
+.senvar-meta{
+  padding:4px 8px
 }
 
-.senvar-meta-row div{
-  padding:5px;
-  border-left:1px solid #111
+.senvar-meta-row{
+  display:flex;
+  justify-content:space-between;
+  gap:5px;
+  min-height:27px
 }
 
-.senvar-meta-row div:last-child{
-  border-left:0
+.senvar-meta-row span{
+  font-weight:700
 }
 
 .senvar-appointment{
+  border:2px solid #111;
+  border-radius:16px;
   text-align:center;
-  padding:6px;
-  border:1px solid #111;
-  border-top:0;
-  font-weight:bold
+  padding:7px 4px;
+  font-size:12pt;
+  margin:4px 0 18px
 }
 
 .senvar-main{
-  border:1px solid #111;
-  margin-top:8px
+  padding:0 5px
 }
 
 .senvar-title{
   text-align:center;
-  font-weight:bold;
-  font-size:15px;
-  padding:7px;
+  font-weight:700;
+  font-size:14pt;
+  padding:4px 0;
   border-bottom:1px solid #111
 }
 
 .senvar-row{
-  display:grid;
-  grid-template-columns:1fr 150px;
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  padding:3px 0;
   border-bottom:1px solid #111
 }
 
-.senvar-row:last-child{
-  border-bottom:0
+.senvar-row .label{
+  font-weight:700
 }
 
-.senvar-row div{
-  padding:5px
-}
-
-.senvar-row div:last-child{
-  border-right:1px solid #111;
-  text-align:center
+.senvar-row.total{
+  font-weight:700;
+  font-size:14pt
 }
 
 .senvar-trip{
   text-align:center;
-  font-weight:bold;
-  margin-top:7px
+  font-weight:700;
+  margin:10px 0 5px
 }
 
 .senvar-qr{
-  display:flex;
-  justify-content:center;
-  margin-top:8px
+  text-align:center
+}
+
+.senvar-qr canvas,
+.senvar-qr img{
+  width:1.75in!important;
+  height:1.75in!important
 }
 
 .senvar-code{
   text-align:center;
-  font-size:10px;
+  font-size:11pt;
+  font-weight:700;
   margin-top:5px;
   word-break:break-all
+}
+
+.senvar-footer{
+  text-align:right;
+  margin-top:7px;
+  font-size:10pt
 }
 
 .hidden{
@@ -433,6 +464,7 @@ th{
 }
 
 @media(max-width:850px){
+
   .grid{
     grid-template-columns:repeat(2,1fr)
   }
@@ -443,6 +475,7 @@ th{
 }
 
 @media(max-width:550px){
+
   .grid{
     grid-template-columns:1fr
   }
@@ -460,6 +493,7 @@ th{
 }
 
 @media print{
+
   body *{
     visibility:hidden!important
   }
@@ -473,25 +507,45 @@ th{
     display:block!important;
     position:absolute!important;
     background:#fff!important;
-    padding:0!important
+    padding:0!important;
+    inset:0
   }
 
   .panel{
-    padding:0!important
+    padding:0!important;
+    max-width:none!important
   }
 
   .mb{
     display:none!important
   }
+
+  .receipt{
+    margin:0!important
+  }
+
+  .receipt-badpa{
+    page:badpa
+  }
+
+  .receipt-senvar{
+    page:senvar
+  }
+}
+
+@page badpa{
+  size:3in 8.5in;
+  margin:0
+}
+
+@page senvar{
+  size:3in 10.5in;
+  margin:0
 }
 </style>
 </head>
 
 <body>
-
-<!-- =========================
-     LOGIN
-========================= -->
 
 <div id="loginPage">
 
@@ -512,14 +566,9 @@ th{
     </div>
 
     <div class="actions">
-
-      <button
-        id="loginBtn"
-        class="main"
-        onclick="login()">
+      <button id="loginBtn" class="main" onclick="login()">
         ورود
       </button>
-
     </div>
 
     <div id="loginMsg" class="msg"></div>
@@ -529,10 +578,6 @@ th{
 </div>
 
 
-<!-- =========================
-     ADMIN
-========================= -->
-
 <div id="adminPage" style="display:none">
 
   <div class="top">
@@ -540,19 +585,8 @@ th{
     <b>مدیریت نوبت‌ها</b>
 
     <div>
-
-      <button
-        class="light"
-        onclick="goHome()">
-        ⌂ خانه
-      </button>
-
-      <button
-        class="light"
-        onclick="logout()">
-        خروج
-      </button>
-
+      <button class="light" onclick="goHome()">⌂ خانه</button>
+      <button class="light" onclick="logout()">خروج</button>
     </div>
 
   </div>
@@ -560,147 +594,94 @@ th{
 
   <main class="wrap">
 
-
-    <!-- =========================
-         FORM
-    ========================= -->
-
     <div class="card">
 
-      <h2 id="formTitle">
-        ثبت نوبت جدید
-      </h2>
+      <h2 id="formTitle">ثبت نوبت جدید</h2>
 
-      <p>
-        اطلاعات نوبت و رسید از اینجا قابل ویرایش است.
-      </p>
+      <p>اطلاعات نوبت و رسید از اینجا قابل ویرایش است.</p>
 
-      <input
-        type="hidden"
-        id="editId">
-
+      <input type="hidden" id="editId">
 
       <div class="grid">
-
 
         <div class="f">
           <label>شماره نوبت / سریال</label>
           <input id="serial">
         </div>
 
-
-        <div class="f">
-          <label>توکن اختصاصی QR</label>
-
-          <input
-            id="public_token"
-            readonly
-            placeholder="بعد از ذخیره ساخته می‌شود">
-
-        </div>
-
-
         <div class="f">
           <label>نام مرز</label>
           <input id="border_name">
         </div>
-
 
         <div class="f">
           <label>نوع صف</label>
           <input id="queue_type">
         </div>
 
-
         <div class="f">
           <label>پلاک</label>
           <input id="plate_number">
         </div>
-
 
         <div class="f">
           <label>نوع نوبت</label>
           <input id="appointment_type">
         </div>
 
-
         <div class="f">
           <label>زمان دریافت</label>
-          <input
-            id="received_at"
-            type="datetime-local">
+          <input id="received_at" type="datetime-local">
         </div>
-
 
         <div class="f">
           <label>وضعیت</label>
           <input id="status">
         </div>
 
-
         <div class="f">
           <label>ترمینال</label>
           <input id="terminal">
         </div>
-
 
         <div class="f">
           <label>شماره خدمت</label>
           <input id="service_number">
         </div>
 
-
         <div class="f">
           <label>ورود به ترمینال</label>
-          <input
-            id="entered_terminal_at"
-            type="datetime-local">
+          <input id="entered_terminal_at" type="datetime-local">
         </div>
-
 
         <div class="f">
           <label>فراخوان</label>
-          <input
-            id="called_at"
-            type="datetime-local">
+          <input id="called_at" type="datetime-local">
         </div>
-
 
         <div class="f">
           <label>خروج از ترمینال</label>
-          <input
-            id="exited_terminal_at"
-            type="datetime-local">
+          <input id="exited_terminal_at" type="datetime-local">
         </div>
-
 
         <div class="f">
           <label>مجاز گمرک</label>
-          <input
-            id="allowed_customs_at"
-            type="datetime-local">
+          <input id="allowed_customs_at" type="datetime-local">
         </div>
 
-
         <div class="f">
-
           <label>اسم پارکینگ / مجموعه</label>
-
           <input
             id="parking_name"
             placeholder="بادپا – ریمدان یا سنوار حیات – ریمدان"
             oninput="showTemplateHint()">
-
         </div>
-
 
         <div class="f">
 
           <label>قالب رسید</label>
 
-          <select
-            id="receipt_template"
-            onchange="showTemplateHint()">
+          <select id="receipt_template">
 
             <option value="auto">
               تشخیص خودکار از اسم پارکینگ
@@ -716,105 +697,83 @@ th{
 
           </select>
 
-          <div
-            id="templateHint"
-            class="hint">
-          </div>
+          <div id="templateHint" class="hint"></div>
 
         </div>
-
 
         <div class="f">
           <label>ترانزیت (فقط بادپا)</label>
           <input id="receipt_transit">
         </div>
 
-
         <div class="f">
           <label>نوع ناوگان</label>
           <input id="receipt_vehicle_type">
         </div>
-
 
         <div class="f">
           <label>وضعیت بار</label>
           <input id="receipt_load_status">
         </div>
 
-
         <div class="f">
           <label>ورود روی رسید</label>
           <input id="receipt_entry_time">
         </div>
-
 
         <div class="f">
           <label>فراخوان روی رسید</label>
           <input id="receipt_call_time">
         </div>
 
-
         <div class="f">
           <label>خروج روی رسید</label>
           <input id="receipt_exit_time">
         </div>
-
 
         <div class="f">
           <label>مدت پارک (بادپا)</label>
           <input id="parking_duration">
         </div>
 
-
         <div class="f">
           <label>خدمات پارکینگ</label>
           <input id="parking_service">
         </div>
 
-
         <div class="f">
           <label>خدمات شهرداری</label>
-          <input
-            id="municipality_service"
-            value="0">
+          <input id="municipality_service">
         </div>
-
 
         <div class="f">
           <label>مالیات ارزش افزوده</label>
           <input id="vat">
         </div>
 
-
         <div class="f">
           <label>جمع پرداختی</label>
           <input id="total_payment">
         </div>
-
 
         <div class="f">
           <label>شناسه سفر (فقط سنوار)</label>
           <input id="trip_id">
         </div>
 
-
         <div class="f">
           <label>عنوان بار</label>
           <input id="cargo_title">
         </div>
-
 
         <div class="f s2">
           <label>کد پایین رسید</label>
           <input id="receipt_code">
         </div>
 
-
         <div class="f s4">
 
-          <label>
-            متن توضیحات رسید (بادپا)
-          </label>
+          <label>متن توضیحات رسید (بادپا)</label>
 
           <textarea id="receipt_note">راننده گرامی توجه داشته باشید
 انقضا قبض شما: [زمان انقضا]
@@ -822,74 +781,44 @@ th{
 
         </div>
 
-
         <div class="f">
-
-          <label>
-            زمان پایین رسید سنوار
-          </label>
-
+          <label>زمان پایین رسید سنوار</label>
           <input
             id="senvar_footer_time"
             placeholder="ب.ظ 09:40:14 1405/05/26">
-
         </div>
 
       </div>
 
-
       <div class="actions">
 
-        <button
-          id="saveBtn"
-          class="main"
-          onclick="saveAppointment()">
+        <button id="saveBtn" class="main" onclick="saveAppointment()">
           ذخیره نوبت
         </button>
 
-
-        <button
-          class="light"
-          onclick="resetForm()">
+        <button class="light" onclick="resetForm()">
           پاک کردن
         </button>
 
-
-        <button
-          class="green"
-          onclick="preview()">
+        <button class="green" onclick="preview()">
           پیش‌نمایش رسید
         </button>
 
       </div>
 
-
-      <div
-        id="formMsg"
-        class="msg">
-      </div>
+      <div id="formMsg" class="msg"></div>
 
     </div>
 
-
-    <!-- =========================
-         LIST
-    ========================= -->
 
     <div class="card">
 
       <div class="toolbar">
 
         <div>
-
-          <h2>
-            لیست نوبت‌ها
-          </h2>
-
+          <h2>لیست نوبت‌ها</h2>
           <span id="count"></span>
-
         </div>
-
 
         <input
           id="search"
@@ -899,17 +828,13 @@ th{
 
       </div>
 
-
       <div class="actions">
 
-        <button
-          class="light"
-          onclick="load()">
+        <button class="light" onclick="load()">
           ↻ بروزرسانی
         </button>
 
       </div>
-
 
       <div class="tw">
 
@@ -942,35 +867,25 @@ th{
 </div>
 
 
-<!-- =========================
-     RECEIPT MODAL
-========================= -->
-
-<div
-  id="modal"
-  class="modal">
+<div id="modal" class="modal">
 
   <div class="panel">
 
     <div
       class="mb"
-      style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      style="display:flex;justify-content:space-between;margin-bottom:10px">
 
       <b id="modalTitle">
-        رسید
+        رسید نوبت + QR
       </b>
 
       <div>
 
-        <button
-          class="green"
-          onclick="printReceipt()">
+        <button class="green" onclick="printReceipt()">
           چاپ
         </button>
 
-        <button
-          class="light"
-          onclick="closeReceipt()">
+        <button class="light" onclick="closeReceipt()">
           بستن
         </button>
 
@@ -979,124 +894,56 @@ th{
     </div>
 
 
-    <!-- =========================
-         BADPA RECEIPT
-    ========================= -->
+    <!-- رسید بادپا -->
 
-    <div
-      id="receiptBadpa"
-      class="receipt receipt-badpa hidden">
+    <div id="receiptBadpa" class="receipt receipt-badpa">
 
-      <div
-        id="bParking"
-        class="badpa-head">
-        بادپا – ریمدان
-      </div>
+      <div class="badpa-box">
 
-
-      <div
-        id="bTransit"
-        class="badpa-sub">
-        ترانزیت
-      </div>
-
-
-      <div class="badpa-info">
-
-
-        <div class="badpa-row">
-
-          <div class="badpa-cell">
-            زمان ورود
-          </div>
-
-          <div
-            id="bEntry"
-            class="badpa-cell">
-          </div>
-
+        <div class="badpa-head" id="bParking">
+          بادپا – ریمدان
         </div>
 
+        <div class="badpa-info">
 
-        <div class="badpa-row">
-
-          <div class="badpa-cell">
-            نوع ناوگان
+          <div class="badpa-transit">
+            ترانزیت
+            <span id="bTransit"></span>
           </div>
 
-          <div
-            id="bVehicle"
-            class="badpa-cell">
+          <div class="badpa-line">
+            <b>زمان ورود</b>
+            <span id="bEntry"></span>
           </div>
 
-        </div>
-
-
-        <div class="badpa-row">
-
-          <div class="badpa-cell">
-            وضعیت
+          <div class="badpa-line">
+            <b>نوع ناو گان</b>
+            <span id="bVehicle"></span>
           </div>
 
-          <div
-            id="bLoad"
-            class="badpa-cell">
+          <div class="badpa-line">
+            <b>وضعیت</b>
+            <span id="bLoad"></span>
           </div>
 
-        </div>
-
-
-        <div class="badpa-row">
-
-          <div class="badpa-cell">
-            پلاک
+          <div class="badpa-line badpa-plate">
+            <b>پلاک</b>
+            <span id="bPlate"></span>
           </div>
 
-          <div
-            id="bPlate"
-            class="badpa-cell">
+          <div class="badpa-line">
+            <b>فراخوان</b>
+            <span id="bCall"></span>
           </div>
 
-        </div>
-
-
-        <div class="badpa-row">
-
-          <div class="badpa-cell">
-            فراخوان
+          <div class="badpa-line">
+            <b>زمان خروج</b>
+            <span id="bExit"></span>
           </div>
 
-          <div
-            id="bCall"
-            class="badpa-cell">
-          </div>
-
-        </div>
-
-
-        <div class="badpa-row">
-
-          <div class="badpa-cell">
-            زمان خروج
-          </div>
-
-          <div
-            id="bExit"
-            class="badpa-cell">
-          </div>
-
-        </div>
-
-
-        <div class="badpa-row">
-
-          <div class="badpa-cell">
-            مدت پارک
-          </div>
-
-          <div
-            id="bDuration"
-            class="badpa-cell">
+          <div class="badpa-line">
+            <b>مدت پارک</b>
+            <span id="bDuration"></span>
           </div>
 
         </div>
@@ -1106,277 +953,161 @@ th{
 
       <div class="badpa-money">
 
-
         <div class="badpa-money-row">
-
-          <div>
-            خدمات پارکینگ
-          </div>
-
-          <div id="bParkingMoney"></div>
-
+          <span>خدمات پارکینگ</span>
+          <span id="bParkingMoney"></span>
         </div>
 
-
         <div class="badpa-money-row">
-
-          <div>
-            تاخیر در خروج
-          </div>
-
-          <div>
-            0
-          </div>
-
+          <span>تاخیر در خروج</span>
+          <span>0</span>
         </div>
 
-
         <div class="badpa-money-row">
-
-          <div>
-            خدمات شهرداری
-          </div>
-
-          <div id="bMunicipality"></div>
-
+          <span>خدمات شهرداری</span>
+          <span id="bMunicipality"></span>
         </div>
 
-
         <div class="badpa-money-row">
-
-          <div>
-            مالیات ارزش افزوده
-          </div>
-
-          <div id="bVat"></div>
-
+          <span>مالیات ارزش افزوده</span>
+          <span id="bVat"></span>
         </div>
 
-
         <div class="badpa-money-row">
-
-          <div>
-            جمع پرداختی
-          </div>
-
-          <div id="bTotal"></div>
-
+          <span>جمع پرداختی</span>
+          <span id="bTotal"></span>
         </div>
 
       </div>
 
 
-      <div
-        id="bCargo"
-        class="badpa-cargo">
+      <div class="badpa-cargo" id="bCargo">
+        تانکر صادرات گاز
       </div>
 
 
-      <div
-        id="bNote"
-        class="badpa-note">
-      </div>
+      <div class="badpa-note" id="bNote"></div>
 
 
-      <div
-        id="qrBadpa"
-        class="badpa-qr">
-      </div>
+      <div class="badpa-qrpage">
 
+        <div id="qrBadpa"></div>
 
-      <div
-        id="bCode"
-        class="badpa-code">
+        <div class="badpa-code" id="bCode"></div>
+
       </div>
 
     </div>
 
 
-    <!-- =========================
-         SENVAR RECEIPT
-    ========================= -->
+    <!-- رسید سنوار -->
 
-    <div
-      id="receiptSenvar"
-      class="receipt receipt-senvar hidden">
+    <div id="receiptSenvar" class="receipt receipt-senvar hidden">
 
+      <div class="senvar-topbox">
 
-      <div
-        id="sParking"
-        class="senvar-top">
-        سنوار حیات – ریمدان
+        <div class="big">
+          شناسه سفر سامانه جامع حمل و نقل
+        </div>
+
+        <div class="big" style="margin-top:8px">
+          تانکر صادرات گاز
+        </div>
+
+        <div class="top-code" id="sTopCode"></div>
+
       </div>
 
 
-      <div
-        id="sPlate"
-        class="senvar-plate">
+      <div class="senvar-plate">
+        پلاک
+        <span id="sPlate"></span>
       </div>
 
 
       <div class="senvar-meta">
 
-
         <div class="senvar-meta-row">
-
-          <div>
-            نوع ناوگان
-          </div>
-
-          <div id="sVehicle"></div>
-
+          <span>نوع ناوگان</span>
+          <span id="sVehicle"></span>
         </div>
 
-
         <div class="senvar-meta-row">
-
-          <div>
-            وضعیت بار
-          </div>
-
-          <div id="sLoad"></div>
-
-        </div>
-
-
-        <div class="senvar-meta-row">
-
-          <div>
-            دریافت نوبت
-          </div>
-
-          <div id="sReceive"></div>
-
+          <span id="sLoad"></span>
+          <span id="sReceive"></span>
         </div>
 
       </div>
 
 
-      <div
-        id="sAppointment"
-        class="senvar-appointment">
+      <div class="senvar-appointment" id="sAppointment">
         گاز صادرات تانکر
       </div>
 
 
       <div class="senvar-main">
 
-
-        <div
-          id="sTitle"
-          class="senvar-title">
-          سنوار حیات – ریمدان
+        <div class="senvar-title" id="sTitle">
+          سنوار حیات - ریمدان
         </div>
 
-
         <div class="senvar-row">
-
-          <div>
-            زمان ورود
-          </div>
-
-          <div id="sEntry"></div>
-
+          <span class="label">زمان ورود</span>
+          <span id="sEntry"></span>
         </div>
 
-
         <div class="senvar-row">
-
-          <div>
-            فراخوان
-          </div>
-
-          <div id="sCall"></div>
-
+          <span class="label">فراخوان</span>
+          <span id="sCall"></span>
         </div>
 
-
         <div class="senvar-row">
-
-          <div>
-            زمان خروج
-          </div>
-
-          <div id="sExit"></div>
-
+          <span class="label">زمان خروج</span>
+          <span id="sExit"></span>
         </div>
 
-
         <div class="senvar-row">
-
-          <div>
-            خدمات پارکینگ
-          </div>
-
-          <div id="sParkingMoney"></div>
-
+          <span class="label">خدمات پارکینگ</span>
+          <span id="sParkingMoney"></span>
         </div>
 
-
         <div class="senvar-row">
-
-          <div>
-            تاخیر در خروج
-          </div>
-
-          <div>
-            0
-          </div>
-
+          <span class="label">تاخیر در خروج</span>
+          <span>0</span>
         </div>
 
-
         <div class="senvar-row">
-
-          <div>
-            خدمات شهرداری
-          </div>
-
-          <div id="sMunicipality"></div>
-
+          <span class="label">خدمات شهرداری</span>
+          <span id="sMunicipality"></span>
         </div>
 
-
         <div class="senvar-row">
-
-          <div>
-            مالیات ارزش افزوده
-          </div>
-
-          <div id="sVat"></div>
-
+          <span class="label">مالیات ارزش افزوده</span>
+          <span id="sVat"></span>
         </div>
 
-
-        <div class="senvar-row">
-
-          <div>
-            جمع پرداختی
-          </div>
-
-          <div id="sTotal"></div>
-
+        <div class="senvar-row total">
+          <span>جمع پرداختی</span>
+          <span id="sTotal"></span>
         </div>
 
       </div>
 
 
-      <div
-        id="sTrip"
-        class="senvar-trip">
+      <div class="senvar-trip">
+        شناسه سفر سامانه جامع حمل و نقل:
+        <span id="sTrip"></span>
       </div>
 
 
-      <div
-        id="qrSenvar"
-        class="senvar-qr">
+      <div class="senvar-qr">
+        <div id="qrSenvar"></div>
       </div>
 
 
-      <div
-        id="sFooter"
-        class="senvar-code">
-      </div>
+      <div class="senvar-code" id="sCode"></div>
+
+      <div class="senvar-footer" id="sFooter"></div>
 
     </div>
 
@@ -1387,20 +1118,15 @@ th{
 
 <script>
 
-let sb = null;
-let rows = [];
+let sb=null;
+let rows=[];
 
+/*
+  آدرس سایت خودمان
+  و نه سایت نمونه new5
+*/
+const SITE='https://bordarpark1-ir.github.io/New1/';
 
-/* آدرس واقعی سایت خودمان، نه new5 */
-
-const SITE =
-  location.origin +
-  location.pathname.replace(/\/admin6\.html$/i,'');
-
-
-/* =========================
-   ابزارها
-========================= */
 
 function init(){
 
@@ -1410,316 +1136,235 @@ function init(){
     !window.SUPABASE_ANON_KEY
   ){
 
-    document.getElementById('loginMsg').textContent =
-      'تنظیمات اتصال به پایگاه داده پیدا نشد.';
-
-    document.getElementById('loginMsg').className =
-      'msg show err';
+    msg(
+      'loginMsg',
+      'Supabase یا config.js بارگذاری نشده است.',
+      1
+    );
 
     return false;
   }
 
-  sb =
-    window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+  sb=window.supabase.createClient(
+    window.SUPABASE_URL,
+    window.SUPABASE_ANON_KEY
+  );
 
   return true;
 }
 
 
-function val(id){
+function msg(id,t,e){
 
-  const e =
-    document.getElementById(id);
+  let x=document.getElementById(id);
 
-  return e ? e.value : '';
+  x.textContent=t;
 
-}
-
-
-function set(id,value){
-
-  const e =
-    document.getElementById(id);
-
-  if(e){
-    e.value = value ?? '';
-  }
-
+  x.className='msg show '+(e?'err':'ok');
 }
 
 
 function hide(id){
 
-  const e =
-    document.getElementById(id);
-
-  if(e){
-    e.classList.remove('show');
-  }
-
-}
-
-
-function msg(id,text,error=false){
-
-  const e =
-    document.getElementById(id);
-
-  e.textContent = text;
-
-  e.className =
-    'msg show ' +
-    (error ? 'err' : 'ok');
+  document.getElementById(id).className='msg';
 }
 
 
 function esc(v){
 
-  return String(v ?? '')
-    .replace(/[&<>"']/g,s=>({
-
+  return String(v??'').replace(
+    /[&<>"']/g,
+    m=>({
       '&':'&amp;',
       '<':'&lt;',
       '>':'&gt;',
       '"':'&quot;',
       "'":'&#039;'
-
-    }[s]));
-
-}
-
-
-function dt(v){
-
-  if(!v) return '';
-
-  try{
-
-    const d = new Date(v);
-
-    return d.toLocaleString(
-      'fa-IR',
-      {
-        year:'numeric',
-        month:'2-digit',
-        day:'2-digit',
-        hour:'2-digit',
-        minute:'2-digit'
-      }
-    );
-
-  }catch(e){
-
-    return String(v);
-
-  }
-
-}
-
-
-function inp(v){
-
-  if(!v) return '';
-
-  try{
-
-    const d =
-      new Date(v);
-
-    const pad =
-      n => String(n).padStart(2,'0');
-
-    return (
-      d.getFullYear() +
-      '-' +
-      pad(d.getMonth()+1) +
-      '-' +
-      pad(d.getDate()) +
-      'T' +
-      pad(d.getHours()) +
-      ':' +
-      pad(d.getMinutes())
-    );
-
-  }catch(e){
-
-    return '';
-
-  }
-
-}
-
-
-function iso(id){
-
-  const v = val(id);
-
-  if(!v) return null;
-
-  const d =
-    new Date(v);
-
-  return isNaN(d.getTime())
-    ? null
-    : d.toISOString();
+    }[m])
+  );
 
 }
 
 
 function money(v){
 
-  if(
-    v === null ||
-    v === undefined ||
-    v === ''
-  ){
+  let n=Number(
+    String(v??'').replace(/,/g,'')
+  );
 
-    return '';
-
-  }
-
-  const n =
-    Number(
-      String(v)
-        .replace(/,/g,'')
-    );
-
-  if(isNaN(n)){
-    return esc(v);
-  }
-
-  return n.toLocaleString('fa-IR');
+  return Number.isFinite(n)
+    ? n.toLocaleString('en-US')
+    : v||'0';
 
 }
 
 
-/* =========================
-   قالب رسید
-========================= */
+function dt(v){
+
+  if(!v)return '';
+
+  let d=new Date(v);
+
+  if(isNaN(d))
+    return String(v);
+
+  return d.getFullYear()+
+    '-'+
+    String(d.getMonth()+1).padStart(2,'0')+
+    '-'+
+    String(d.getDate()).padStart(2,'0')+
+    ' '+
+    String(d.getHours()).padStart(2,'0')+
+    ':'+
+    String(d.getMinutes()).padStart(2,'0');
+
+}
+
+
+function inp(v){
+
+  if(!v)return '';
+
+  let d=new Date(v);
+
+  if(isNaN(d))
+    return '';
+
+  return d.getFullYear()+
+    '-'+
+    String(d.getMonth()+1).padStart(2,'0')+
+    '-'+
+    String(d.getDate()).padStart(2,'0')+
+    'T'+
+    String(d.getHours()).padStart(2,'0')+
+    ':'+
+    String(d.getMinutes()).padStart(2,'0');
+
+}
+
+
+function val(id){
+
+  return document.getElementById(id).value;
+
+}
+
+
+function set(id,v){
+
+  document.getElementById(id).value=v??'';
+
+}
+
+
+function iso(id){
+
+  let v=val(id);
+
+  return v
+    ? new Date(v).toISOString()
+    : null;
+
+}
+
+
+function goHome(){
+
+  location.href=SITE;
+
+}
+
 
 function templateFor(a){
 
-  if(
-    a &&
-    a.receipt_template &&
-    a.receipt_template !== 'auto'
-  ){
-
-    return a.receipt_template;
-
-  }
-
-  const name =
-    String(
-      a?.parking_name || ''
-    ).toLowerCase();
+  let chosen=a.receipt_template||'auto';
 
   if(
-    name.includes('سنوار') ||
-    name.includes('senvar')
-  ){
+    chosen==='badpa' ||
+    chosen==='senvar'
+  )
+    return chosen;
 
-    return 'senvar';
+  let n=String(
+    a.parking_name||''
+  ).toLowerCase();
 
-  }
-
-  return 'badpa';
+  return
+    n.includes('سنوار') ||
+    n.includes('senvar')
+      ? 'senvar'
+      : 'badpa';
 
 }
 
 
 function showTemplateHint(){
 
-  const select =
-    document.getElementById(
-      'receipt_template'
-    );
+  let t=templateFor({
 
-  const parking =
-    val('parking_name');
+    parking_name:val('parking_name'),
 
-  let t =
-    select.value;
+    receipt_template:
+      val('receipt_template')
 
-  if(t === 'auto'){
-
-    t =
-      /سنوار|senvar/i.test(parking)
-        ? 'senvar'
-        : 'badpa';
-
-  }
+  });
 
   document.getElementById(
     'templateHint'
-  ).textContent =
-    t === 'senvar'
-      ? 'قالب فعال: سنوار حیات – ریمدان'
+  ).textContent=
+    t==='senvar'
+      ? 'قالب فعال: سنوار حیات'
       : 'قالب فعال: بادپا – ریمدان';
 
 }
 
 
-/* =========================
-   ورود
-========================= */
-
 async function login(){
 
   hide('loginMsg');
 
-  const email =
-    val('email').trim();
+  if(!sb && !init())
+    return;
 
-  const password =
-    val('password');
+  let email=val('email').trim();
+  let password=val('password');
 
   if(!email || !password){
 
     msg(
       'loginMsg',
       'ایمیل و رمز عبور را وارد کنید.',
-      true
+      1
     );
 
     return;
   }
 
-  const b =
-    document.getElementById('loginBtn');
+  let b=document.getElementById('loginBtn');
 
-  b.disabled = true;
-  b.textContent = 'در حال ورود...';
+  b.disabled=true;
+  b.textContent='در حال ورود...';
 
   try{
 
-    const {
-      data,
-      error
-    } =
-      await sb.auth.signInWithPassword({
-        email,
-        password
-      });
+    let {data,error}=await sb.auth.signInWithPassword({
+      email,
+      password
+    });
 
     if(error)
       throw error;
 
     if(!data.user)
-      throw new Error(
-        'ورود انجام نشد.'
-      );
+      throw Error('ورود انجام نشد');
 
     document.getElementById(
       'loginPage'
-    ).style.display = 'none';
+    ).style.display='none';
 
     document.getElementById(
       'adminPage'
-    ).style.display = 'block';
+    ).style.display='block';
 
     await load();
 
@@ -1727,15 +1372,14 @@ async function login(){
 
     msg(
       'loginMsg',
-      'خطا در ورود: ' +
-      e.message,
-      true
+      'خطا در ورود: '+e.message,
+      1
     );
 
   }finally{
 
-    b.disabled = false;
-    b.textContent = 'ورود';
+    b.disabled=false;
+    b.textContent='ورود';
 
   }
 
@@ -1746,20 +1390,17 @@ async function session(){
 
   try{
 
-    const {
-      data
-    } =
-      await sb.auth.getSession();
+    let {data}=await sb.auth.getSession();
 
     if(data.session){
 
       document.getElementById(
         'loginPage'
-      ).style.display = 'none';
+      ).style.display='none';
 
       document.getElementById(
         'adminPage'
-      ).style.display = 'block';
+      ).style.display='block';
 
       await load();
 
@@ -1779,44 +1420,24 @@ async function logout(){
 }
 
 
-function goHome(){
-
-  location.href =
-    SITE + '/';
-
-}
-
-
-/* =========================
-   دریافت اطلاعات
-========================= */
-
 async function load(){
 
   document.getElementById(
     'body'
-  ).innerHTML =
+  ).innerHTML=
     '<tr><td colspan="7">در حال دریافت...</td></tr>';
 
   try{
 
-    const {
-      data,
-      error
-    } =
-      await sb
-        .from('appointments')
-        .select('*')
-        .order(
-          'id',
-          {ascending:false}
-        );
+    let {data,error}=await sb
+      .from('appointments')
+      .select('*')
+      .order('id',{ascending:false});
 
     if(error)
       throw error;
 
-    rows =
-      data || [];
+    rows=data||[];
 
     render();
 
@@ -1824,9 +1445,9 @@ async function load(){
 
     document.getElementById(
       'body'
-    ).innerHTML =
-      '<tr><td colspan="7">خطا: ' +
-      esc(e.message) +
+    ).innerHTML=
+      '<tr><td colspan="7">خطا: '+
+      esc(e.message)+
       '</td></tr>';
 
   }
@@ -1834,73 +1455,52 @@ async function load(){
 }
 
 
-/* =========================
-   لیست
-========================= */
-
 function render(){
 
-  const q =
-    val('search')
-      .trim()
-      .toLowerCase();
+  let q=val('search')
+    .trim()
+    .toLowerCase();
 
-  const a =
-    rows.filter(x => {
-
-      if(!q)
-        return true;
-
-      return [
-        x.serial,
-        x.plate_number,
-        x.border_name,
-        x.parking_name,
-        x.queue_type,
-        x.appointment_type,
-        x.status,
-        x.terminal
-      ].some(v =>
-        String(v ?? '')
-          .toLowerCase()
-          .includes(q)
-      );
-
-    });
-
+  let a=rows.filter(x=>
+    !q ||
+    [
+      x.serial,
+      x.plate_number,
+      x.border_name,
+      x.parking_name,
+      x.queue_type,
+      x.appointment_type,
+      x.status,
+      x.terminal
+    ].some(v=>
+      String(v??'')
+        .toLowerCase()
+        .includes(q)
+    )
+  );
 
   document.getElementById(
     'count'
-  ).textContent =
-    a.length + ' نوبت';
-
+  ).textContent=a.length+' نوبت';
 
   document.getElementById(
     'body'
-  ).innerHTML =
+  ).innerHTML=
 
     a.length
 
-      ? a.map(x => `
+      ? a.map(x=>`
 
         <tr>
 
-          <td>
-            ${esc(x.serial)}
-          </td>
+          <td>${esc(x.serial)}</td>
+
+          <td>${esc(x.plate_number)}</td>
+
+          <td>${esc(x.border_name)}</td>
 
           <td>
-            ${esc(x.plate_number)}
-          </td>
-
-          <td>
-            ${esc(x.border_name)}
-          </td>
-
-          <td>
-
             <span class="templateBadge">
-
               ${esc(
                 x.parking_name ||
                 (
@@ -1909,18 +1509,12 @@ function render(){
                     : 'بادپا – ریمدان'
                 )
               )}
-
             </span>
-
           </td>
 
-          <td>
-            ${esc(x.appointment_type)}
-          </td>
+          <td>${esc(x.appointment_type)}</td>
 
-          <td>
-            ${esc(x.status)}
-          </td>
+          <td>${esc(x.status)}</td>
 
           <td>
 
@@ -1954,37 +1548,29 @@ function render(){
 
       `).join('')
 
-      :
-
-      '<tr><td colspan="7">نوبتی پیدا نشد.</td></tr>';
+      : `
+        <tr>
+          <td colspan="7">
+            نوبتی پیدا نشد.
+          </td>
+        </tr>
+      `;
 
 }
 
 
-/* =========================
-   ویرایش
-========================= */
-
 function edit(id){
 
-  const a =
-    rows.find(
-      x => +x.id === +id
-    );
-
-  if(!a)
-    return;
-
-
-  set(
-    'editId',
-    a.id
+  let a=rows.find(
+    x=>+x.id===+id
   );
 
+  if(!a)return;
+
+  set('editId',a.id);
 
   [
     'serial',
-    'public_token',
     'border_name',
     'queue_type',
     'plate_number',
@@ -2010,13 +1596,9 @@ function edit(id){
     'receipt_code',
     'receipt_note',
     'senvar_footer_time'
-  ].forEach(k =>
-    set(
-      k,
-      a[k] ?? ''
-    )
+  ].forEach(k=>
+    set(k,a[k]??'')
   );
-
 
   [
     'received_at',
@@ -2024,13 +1606,9 @@ function edit(id){
     'called_at',
     'exited_terminal_at',
     'allowed_customs_at'
-  ].forEach(k =>
-    set(
-      k,
-      inp(a[k])
-    )
+  ].forEach(k=>
+    set(k,inp(a[k]))
   );
-
 
   set(
     'receipt_entry_time',
@@ -2038,13 +1616,11 @@ function edit(id){
     dt(a.received_at)
   );
 
-
   set(
     'receipt_call_time',
     a.receipt_call_time ||
     dt(a.called_at)
   );
-
 
   set(
     'receipt_exit_time',
@@ -2052,15 +1628,11 @@ function edit(id){
     dt(a.exited_terminal_at)
   );
 
-
   showTemplateHint();
-
 
   document.getElementById(
     'formTitle'
-  ).textContent =
-    'ویرایش نوبت';
-
+  ).textContent='ویرایش نوبت';
 
   scrollTo({
     top:0,
@@ -2070,43 +1642,31 @@ function edit(id){
 }
 
 
-/* =========================
-   پاک کردن فرم
-========================= */
-
 function resetForm(){
 
   document
     .querySelectorAll(
-      '#adminPage input:not([type="hidden"]),#adminPage textarea'
+      '#adminPage input,#adminPage textarea'
     )
-    .forEach(x => {
-      x.value = '';
-    });
-
+    .forEach(x=>x.value='');
 
   set(
     'receipt_template',
     'auto'
   );
 
-
   set(
     'municipality_service',
     '0'
   );
 
-
   document.getElementById(
     'editId'
-  ).value = '';
-
+  ).value='';
 
   document.getElementById(
     'formTitle'
-  ).textContent =
-    'ثبت نوبت جدید';
-
+  ).textContent='ثبت نوبت جدید';
 
   hide('formMsg');
 
@@ -2115,119 +1675,61 @@ function resetForm(){
 }
 
 
-/* =========================
-   عدد
-========================= */
-
 function num(id){
 
-  const v =
-    val(id)
-      .replace(/,/g,'')
-      .trim();
+  let v=val(id).replace(/,/g,'');
 
-  if(v === '')
-    return null;
-
-  const n =
-    Number(v);
-
-  return isNaN(n)
+  return v===''
     ? null
-    : n;
+    : Number(v);
 
 }
 
-
-/* =========================
-   ذخیره
-========================= */
 
 async function saveAppointment(){
 
   hide('formMsg');
 
-  const serial =
-    val('serial').trim();
+  let serial=val('serial').trim();
 
   if(!serial){
 
     msg(
       'formMsg',
       'شماره نوبت را وارد کنید.',
-      true
+      1
     );
 
     return;
   }
 
-
-  let token =
-    val('public_token').trim();
-
-
-  if(!token){
-
-    token =
-      crypto
-        .randomUUID()
-        .replaceAll('-','');
-
-  }
-
-
-  let template =
-    val('receipt_template');
-
-
-  if(template === 'auto'){
-
-    template =
-      /سنوار|senvar/i.test(
-        val('parking_name')
-      )
-        ? 'senvar'
-        : 'badpa';
-
-  }
-
-
-  const p = {
+  let p={
 
     serial,
 
-    public_token:token,
-
     border_name:
-      val('border_name').trim() ||
-      null,
+      val('border_name').trim()||null,
 
     queue_type:
-      val('queue_type').trim() ||
-      null,
+      val('queue_type').trim()||null,
 
     plate_number:
-      val('plate_number').trim() ||
-      null,
+      val('plate_number').trim()||null,
 
     appointment_type:
-      val('appointment_type').trim() ||
-      null,
+      val('appointment_type').trim()||null,
 
     received_at:
       iso('received_at'),
 
     status:
-      val('status').trim() ||
-      null,
+      val('status').trim()||null,
 
     terminal:
-      val('terminal').trim() ||
-      null,
+      val('terminal').trim()||null,
 
     service_number:
-      val('service_number').trim() ||
-      null,
+      val('service_number').trim()||null,
 
     entered_terminal_at:
       iso('entered_terminal_at'),
@@ -2242,39 +1744,31 @@ async function saveAppointment(){
       iso('allowed_customs_at'),
 
     parking_name:
-      val('parking_name').trim() ||
-      null,
+      val('parking_name').trim()||null,
 
     receipt_template:
-      template,
+      val('receipt_template'),
 
     receipt_transit:
-      val('receipt_transit').trim() ||
-      null,
+      val('receipt_transit').trim()||null,
 
     receipt_vehicle_type:
-      val('receipt_vehicle_type').trim() ||
-      null,
+      val('receipt_vehicle_type').trim()||null,
 
     receipt_load_status:
-      val('receipt_load_status').trim() ||
-      null,
+      val('receipt_load_status').trim()||null,
 
     receipt_entry_time:
-      val('receipt_entry_time').trim() ||
-      null,
+      val('receipt_entry_time').trim()||null,
 
     receipt_call_time:
-      val('receipt_call_time').trim() ||
-      null,
+      val('receipt_call_time').trim()||null,
 
     receipt_exit_time:
-      val('receipt_exit_time').trim() ||
-      null,
+      val('receipt_exit_time').trim()||null,
 
     parking_duration:
-      val('parking_duration').trim() ||
-      null,
+      val('parking_duration').trim()||null,
 
     parking_service:
       num('parking_service'),
@@ -2289,151 +1783,100 @@ async function saveAppointment(){
       num('total_payment'),
 
     trip_id:
-      val('trip_id').trim() ||
-      null,
+      val('trip_id').trim()||null,
 
     cargo_title:
-      val('cargo_title').trim() ||
-      null,
+      val('cargo_title').trim()||null,
 
     receipt_code:
-      val('receipt_code').trim() ||
-      null,
+      val('receipt_code').trim()||null,
 
     receipt_note:
-      val('receipt_note') ||
-      null,
+      val('receipt_note')||null,
 
     senvar_footer_time:
-      val('senvar_footer_time').trim() ||
-      null
+      val('senvar_footer_time').trim()||null
 
   };
 
+  let id=val('editId');
 
-  const id =
-    val('editId');
+  let b=document.getElementById(
+    'saveBtn'
+  );
 
-  const b =
-    document.getElementById(
-      'saveBtn'
-    );
-
-  b.disabled = true;
+  b.disabled=true;
 
   try{
 
-    let r;
+    let r=id
 
-
-    if(id){
-
-      r =
-        await sb
+      ? await sb
           .from('appointments')
           .update(p)
-          .eq('id',id);
+          .eq('id',id)
 
-    }else{
-
-      r =
-        await sb
+      : await sb
           .from('appointments')
           .insert(p);
-
-    }
-
 
     if(r.error)
       throw r.error;
 
-
     msg(
       'formMsg',
       id
-        ? 'نوبت با موفقیت ویرایش شد.'
-        : 'نوبت با موفقیت ثبت شد.'
+        ? 'ویرایش شد.'
+        : 'ثبت شد.'
     );
-
 
     await load();
 
-
-    if(!id){
-
+    if(!id)
       resetForm();
-
-    }
 
   }catch(e){
 
     msg(
       'formMsg',
-      'خطا در ذخیره: ' +
-      e.message,
-      true
+      'خطا در ذخیره: '+e.message,
+      1
     );
 
   }finally{
 
-    b.disabled = false;
+    b.disabled=false;
 
   }
 
 }
 
 
-/* =========================
-   حذف
-========================= */
-
 async function del(id){
 
-  const a =
-    rows.find(
-      x => +x.id === +id
-    );
+  let a=rows.find(
+    x=>+x.id===+id
+  );
 
-
-  if(
-    !confirm(
-      'حذف نوبت ' +
-      (a?.serial || id) +
-      '؟'
-    )
-  ){
-
+  if(!confirm(
+    'حذف نوبت '+
+    (a?.serial||id)+
+    '؟'
+  ))
     return;
 
-  }
+  let {error}=await sb
+    .from('appointments')
+    .delete()
+    .eq('id',id);
 
-
-  const {
-    error
-  } =
-    await sb
-      .from('appointments')
-      .delete()
-      .eq('id',id);
-
-
-  if(error){
-
-    alert(error.message);
-
-    return;
-
-  }
-
+  if(error)
+    return alert(error.message);
 
   await load();
 
 }
 
-
-/* =========================
-   اطلاعات رسید
-========================= */
 
 function data(a){
 
@@ -2441,76 +1884,77 @@ function data(a){
 
     id:a.id,
 
-    serial:
-      a.serial || '',
+    token:a.public_token||'',
+
+    serial:a.serial||'',
 
     template:
       templateFor(a),
 
     parkingName:
-      a.parking_name || '',
+      a.parking_name||'',
 
     transit:
-      a.receipt_transit || '',
+      a.receipt_transit||'',
 
     entry:
-      a.receipt_entry_time ||
+      a.receipt_entry_time||
       dt(a.received_at),
 
     vehicle:
-      a.receipt_vehicle_type || '',
+      a.receipt_vehicle_type||'',
 
     load:
-      a.receipt_load_status || '',
+      a.receipt_load_status||'',
 
     plate:
-      a.plate_number || '',
+      a.plate_number||'',
 
     call:
-      a.receipt_call_time ||
+      a.receipt_call_time||
       dt(a.called_at),
 
     exit:
-      a.receipt_exit_time ||
+      a.receipt_exit_time||
       dt(a.exited_terminal_at),
 
     duration:
-      a.parking_duration || '',
+      a.parking_duration||'',
 
     parking:
-      a.parking_service ?? '',
+      a.parking_service??'',
 
     municipality:
-      a.municipality_service ?? 0,
+      a.municipality_service??0,
 
     vat:
-      a.vat ?? '',
+      a.vat??'',
 
     total:
-      a.total_payment ?? '',
+      a.total_payment??'',
 
     trip:
-      a.trip_id ||
-      a.service_number ||
+      a.trip_id||
+      a.service_number||
       '',
 
     cargo:
-      a.cargo_title ||
+      a.cargo_title||
       'تانکر صادرات گاز',
 
     code:
-      a.receipt_code ||
-      a.serial ||
+      a.receipt_code||
+      a.serial||
       '',
 
     note:
-      a.receipt_note ||
-      `راننده گرامی توجه داشته باشید
-انقضا قبض شما: [زمان انقضا]
-درصورت مراجعه بعد از زمان مذکور از پذیرش شما با این قبض معذور میباشیم`,
+      a.receipt_note||
+      'راننده گرامی توجه داشته باشید\n'+
+      'انقضا قبض شما: [زمان انقضا]\n'+
+      'درصورت مراجعه بعد از زمان مذکور از پذیرش شما با این قبض معذور میباشیم',
 
     footer:
-      a.senvar_footer_time ||
+      a.senvar_footer_time||
       ''
 
   };
@@ -2518,75 +1962,14 @@ function data(a){
 }
 
 
-/* =========================
-   ساخت QR
-========================= */
+function makeQR(text,target){
 
-async function makeQR(id,target){
-
-  target.innerHTML = '';
-
-  const a =
-    rows.find(
-      x => +x.id === +id
-    );
-
-
-  if(!a)
-    return;
-
-
-  let token =
-    a.public_token;
-
-
-  if(!token){
-
-    token =
-      crypto
-        .randomUUID()
-        .replaceAll('-','');
-
-
-    a.public_token =
-      token;
-
-
-    const {
-      error
-    } =
-      await sb
-        .from('appointments')
-        .update({
-          public_token:token
-        })
-        .eq('id',id);
-
-
-    if(error){
-
-      alert(
-        'خطا در ساخت QR: ' +
-        error.message
-      );
-
-      return;
-
-    }
-
-  }
-
-
-  const url =
-    SITE +
-    '/?token=' +
-    encodeURIComponent(token);
-
+  target.innerHTML='';
 
   new QRCode(
     target,
     {
-      text:url,
+      text,
       width:145,
       height:145,
       correctLevel:
@@ -2597,271 +1980,211 @@ async function makeQR(id,target){
 }
 
 
-/* =========================
-   پر کردن رسید
-========================= */
+function fill(d){
 
-async function fill(d){
-
-  const bad =
+  let bad=
     document.getElementById(
       'receiptBadpa'
     );
 
-  const sen =
+  let sen=
     document.getElementById(
       'receiptSenvar'
     );
 
-
   bad.classList.toggle(
     'hidden',
-    d.template !== 'badpa'
+    d.template!=='badpa'
   );
-
 
   sen.classList.toggle(
     'hidden',
-    d.template !== 'senvar'
+    d.template!=='senvar'
   );
-
 
   document.getElementById(
     'modalTitle'
-  ).textContent =
-
-    d.template === 'senvar'
-
+  ).textContent=
+    d.template==='senvar'
       ? 'رسید سنوار حیات + QR'
-
       : 'رسید بادپا – ریمدان + QR';
 
 
-  if(
-    d.template === 'badpa'
-  ){
+  if(d.template==='badpa'){
 
     document.getElementById(
       'bParking'
-    ).textContent =
-      d.parkingName ||
+    ).textContent=
+      d.parkingName||
       'بادپا – ریمدان';
-
 
     document.getElementById(
       'bTransit'
-    ).textContent =
-      d.transit;
-
+    ).textContent=d.transit;
 
     document.getElementById(
       'bEntry'
-    ).textContent =
-      d.entry;
-
+    ).textContent=d.entry;
 
     document.getElementById(
       'bVehicle'
-    ).textContent =
-      d.vehicle;
-
+    ).textContent=d.vehicle;
 
     document.getElementById(
       'bLoad'
-    ).textContent =
-      d.load;
-
+    ).textContent=d.load;
 
     document.getElementById(
       'bPlate'
-    ).textContent =
-      d.plate;
-
+    ).textContent=d.plate;
 
     document.getElementById(
       'bCall'
-    ).textContent =
-      d.call;
-
+    ).textContent=d.call;
 
     document.getElementById(
       'bExit'
-    ).textContent =
-      d.exit;
-
+    ).textContent=d.exit;
 
     document.getElementById(
       'bDuration'
-    ).textContent =
-      d.duration;
-
+    ).textContent=d.duration;
 
     document.getElementById(
       'bParkingMoney'
-    ).textContent =
+    ).textContent=
       money(d.parking);
-
 
     document.getElementById(
       'bMunicipality'
-    ).textContent =
+    ).textContent=
       money(d.municipality);
-
 
     document.getElementById(
       'bVat'
-    ).textContent =
+    ).textContent=
       money(d.vat);
-
 
     document.getElementById(
       'bTotal'
-    ).textContent =
+    ).textContent=
       money(d.total);
-
 
     document.getElementById(
       'bCargo'
-    ).textContent =
-      d.cargo;
-
+    ).textContent=d.cargo;
 
     document.getElementById(
       'bNote'
-    ).textContent =
-      d.note;
-
+    ).textContent=d.note;
 
     document.getElementById(
       'bCode'
-    ).textContent =
-      d.code;
+    ).textContent=d.code;
 
+    makeQR(
+      d.token
+        ? SITE+
+          '?token='+
+          encodeURIComponent(d.token)
+        : SITE+
+          '?id='+
+          encodeURIComponent(d.id),
 
-    await makeQR(
-      d.id,
       document.getElementById(
         'qrBadpa'
       )
     );
 
-
   }else{
 
-
     document.getElementById(
-      'sParking'
-    ).textContent =
-
-      (
-        d.parkingName ||
-        'سنوار حیات – ریمدان'
-      ) +
-
-      (
-        d.trip
-          ? ' - - ' + d.trip
-          : ''
-      );
-
+      'sTopCode'
+    ).textContent=d.trip;
 
     document.getElementById(
       'sPlate'
-    ).textContent =
-      d.plate;
-
+    ).textContent=d.plate;
 
     document.getElementById(
       'sVehicle'
-    ).textContent =
-      d.vehicle;
-
+    ).textContent=d.vehicle;
 
     document.getElementById(
       'sLoad'
-    ).textContent =
-      d.load;
-
+    ).textContent=d.load;
 
     document.getElementById(
       'sReceive'
-    ).textContent =
-      d.entry;
-
+    ).textContent=d.entry;
 
     document.getElementById(
       'sAppointment'
-    ).textContent =
+    ).textContent=
       'گاز   صادرات   تانکر';
-
 
     document.getElementById(
       'sTitle'
-    ).textContent =
-
+    ).textContent=
       (
-        d.parkingName ||
+        d.parkingName||
         'سنوار حیات'
-      ) +
+      )+
       ' - ریمدان';
-
 
     document.getElementById(
       'sEntry'
-    ).textContent =
-      d.entry;
-
+    ).textContent=d.entry;
 
     document.getElementById(
       'sCall'
-    ).textContent =
-      d.call;
-
+    ).textContent=d.call;
 
     document.getElementById(
       'sExit'
-    ).textContent =
-      d.exit;
-
+    ).textContent=d.exit;
 
     document.getElementById(
       'sParkingMoney'
-    ).textContent =
+    ).textContent=
       money(d.parking);
-
 
     document.getElementById(
       'sMunicipality'
-    ).textContent =
+    ).textContent=
       money(d.municipality);
-
 
     document.getElementById(
       'sVat'
-    ).textContent =
+    ).textContent=
       money(d.vat);
-
 
     document.getElementById(
       'sTotal'
-    ).textContent =
+    ).textContent=
       money(d.total);
-
 
     document.getElementById(
       'sTrip'
-    ).textContent =
-      d.trip;
+    ).textContent=d.trip;
 
+    document.getElementById(
+      'sCode'
+    ).textContent=d.code;
 
     document.getElementById(
       'sFooter'
-    ).textContent =
-      d.footer;
+    ).textContent=d.footer;
 
+    makeQR(
+      d.token
+        ? SITE+
+          '?token='+
+          encodeURIComponent(d.token)
+        : SITE+
+          '?id='+
+          encodeURIComponent(d.id),
 
-    await makeQR(
-      d.id,
       document.getElementById(
         'qrSenvar'
       )
@@ -2872,74 +2195,100 @@ async function fill(d){
 }
 
 
-/* =========================
-   نمایش رسید
-========================= */
+async function ensureToken(id){
+
+  let a=rows.find(
+    x=>+x.id===+id
+  );
+
+  if(!a)
+    return null;
+
+  if(a.public_token)
+    return a.public_token;
+
+  let token=
+    crypto.randomUUID
+      ? crypto.randomUUID()
+      : (
+          't'+
+          Date.now()+
+          Math.random()
+            .toString(36)
+            .slice(2)
+        );
+
+  let {error}=await sb
+    .from('appointments')
+    .update({
+      public_token:token
+    })
+    .eq('id',id);
+
+  if(error)
+    throw error;
+
+  a.public_token=token;
+
+  return token;
+
+}
+
 
 async function receipt(id){
 
-  const a =
-    rows.find(
-      x => +x.id === +id
-    );
+  let a=rows.find(
+    x=>+x.id===+id
+  );
 
   if(!a)
     return;
 
+  try{
 
-  await fill(
-    data(a)
-  );
+    await ensureToken(id);
 
+    /*
+      بعد از ساخت توکن، اطلاعات
+      همان رکورد در rows به‌روزرسانی می‌شود.
+    */
 
-  document.getElementById(
-    'modal'
-  ).classList.add('show');
+    fill(data(a));
+
+    document.getElementById(
+      'modal'
+    ).classList.add('show');
+
+  }catch(e){
+
+    alert(
+      'ساخت QR ناموفق بود: '+
+      e.message
+    );
+
+  }
 
 }
 
 
-/* =========================
-   پیش نمایش
-========================= */
+function preview(){
 
-async function preview(){
-
-  const id =
-    val('editId');
-
+  let id=val('editId');
 
   if(!id){
 
-    msg(
+    return msg(
       'formMsg',
       'ابتدا نوبت را ذخیره کنید تا QR اختصاصی ساخته شود.',
-      true
+      1
     );
-
-    return;
 
   }
 
-
-  const a =
-    rows.find(
-      x => +x.id === +id
-    );
-
-
-  if(a){
-
-    await receipt(id);
-
-  }
+  receipt(id);
 
 }
 
-
-/* =========================
-   بستن / چاپ
-========================= */
 
 function closeReceipt(){
 
@@ -2952,95 +2301,56 @@ function closeReceipt(){
 
 function printReceipt(){
 
-  window.print();
+  print();
 
 }
 
 
-/* =========================
-   رفتن به صفحه عمومی خودمان
-========================= */
+async function publicPage(id){
 
-function publicPage(id){
+  try{
 
-  const a =
-    rows.find(
-      x => +x.id === +id
+    let token=
+      await ensureToken(id);
+
+    open(
+      SITE+
+      '?token='+
+      encodeURIComponent(token),
+      '_blank'
     );
 
+  }catch(e){
 
-  if(!a)
-    return;
-
-
-  if(!a.public_token){
-
-    alert(
-      'این نوبت هنوز QR اختصاصی ندارد. ابتدا رسید + QR را باز کنید.'
-    );
-
-    return;
+    alert(e.message);
 
   }
 
-
-  const url =
-    SITE +
-    '/?token=' +
-    encodeURIComponent(
-      a.public_token
-    );
-
-
-  window.open(
-    url,
-    '_blank'
-  );
-
 }
 
 
-/* =========================
-   کلیدها
-========================= */
-
 addEventListener(
   'keydown',
-  e => {
+  e=>{
 
-    if(
-      e.key === 'Escape'
-    ){
-
+    if(e.key==='Escape')
       closeReceipt();
 
-    }
-
-
     if(
-      e.key === 'Enter' &&
-      document.activeElement.id === 'password'
-    ){
-
+      e.key==='Enter' &&
+      document.activeElement.id==='password'
+    )
       login();
-
-    }
 
   }
 );
 
 
-/* =========================
-   شروع
-========================= */
-
 addEventListener(
   'load',
-  () => {
+  ()=>{
 
-    if(
-      init()
-    ){
+    if(init()){
 
       showTemplateHint();
 
