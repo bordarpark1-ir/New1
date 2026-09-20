@@ -1,168 +1,765 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>استعلام نوبت خودرو</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>سامانه نوبت‌دهی مرزی</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/JsBarcode/3.11.5/JsBarcode.all.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
-html,body{
-  margin:0;
-  padding:0;
-  background:#fff;
-  color:#111;
-  font-family:Tahoma,"Segoe UI",Arial,sans-serif;
-}
+  :root {
+    --bg: #eef1f5;
+    --panel: #ffffff;
+    --panel-2: #f5f7fa;
+    --border: #d7dce4;
+    --text: #1b2433;
+    --muted: #5b6576;
+    --accent: #c97f1f;
+    --accent-ink: #ffffff;
+    --accent2: #2f6fed;
+    --success: #1f8a5c;
+    --success-bg: #e3f5ec;
+    --danger: #c8402f;
+    --danger-bg: #fbe7e4;
+    --warn: #c97f1f;
+    --warn-bg: #faf0dd;
+    --info: #2f6fed;
+    --info-bg: #e8f0ff;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(20,26,38,.06), 0 8px 24px rgba(20,26,38,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f141d;
+      --panel: #161d29;
+      --panel-2: #1c2434;
+      --border: #2b3448;
+      --text: #e8ecf3;
+      --muted: #8b94a8;
+      --accent: #e2a23f;
+      --accent-ink: #1a1305;
+      --accent2: #5b93ff;
+      --success: #3fb883;
+      --success-bg: #113224;
+      --danger: #e2695a;
+      --danger-bg: #3a1a17;
+      --warn: #e2a23f;
+      --warn-bg: #3a2c11;
+      --info: #5b93ff;
+      --info-bg: #10203f;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f141d;
+    --panel: #161d29;
+    --panel-2: #1c2434;
+    --border: #2b3448;
+    --text: #e8ecf3;
+    --muted: #8b94a8;
+    --accent: #e2a23f;
+    --accent-ink: #1a1305;
+    --accent2: #5b93ff;
+    --success: #3fb883;
+    --success-bg: #113224;
+    --danger: #e2695a;
+    --danger-bg: #3a1a17;
+    --warn: #e2a23f;
+    --warn-bg: #3a2c11;
+    --info: #5b93ff;
+    --info-bg: #10203f;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Vazirmatn', system-ui, sans-serif;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    min-height: 100%;
+  }
+  .mono { font-family: 'Roboto Mono', ui-monospace, monospace; letter-spacing: .02em; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 60px; }
 
-body{
-  min-height:100vh;
-}
-
-.page{
-  width:100%;
-  max-width:760px;
-  margin:0 auto;
-  padding:18px 14px 30px;
-  box-sizing:border-box;
-}
-
-.msg{
-  text-align:center;
-  margin-top:35vh;
-  font-size:15px;
-  line-height:2;
-}
-
-.box{
-  font-size:13px;
-  line-height:2.15;
-  text-align:right;
-}
-
-.title{
-  text-align:center;
-  font-weight:700;
-  font-size:20px;
-  margin:4px 0 14px;
-}
-
-.row{
-  display:flex;
-  justify-content:space-between;
-  gap:18px;
-  white-space:pre-wrap;
-}
-
-.row b{
-  font-weight:700;
-}
-
-.rule{
-  border-bottom:1px solid #111;
-  margin:5px 0;
-}
-
-.hidden{
-  display:none!important;
-}
-
-@media print{
-  .page{
-    max-width:none;
-    padding:0;
+  /* header */
+  .topbar {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .topbar-inner { max-width: 980px; margin: 0 auto; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; margin-inline-end: auto; }
+  .brand-mark {
+    width: 34px; height: 34px; border-radius: 8px; background: var(--accent); color: var(--accent-ink);
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; flex: none;
+  }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+  .brand-text b { font-size: 15px; font-weight: 700; }
+  .brand-text span { font-size: 12px; color: var(--muted); }
+  .btn {
+    font-family: inherit; font-size: 14px; font-weight: 600; border-radius: 9px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--text); padding: 9px 14px; cursor: pointer; display: inline-flex;
+    align-items: center; gap: 6px; transition: filter .12s ease, transform .05s ease;
+  }
+  .btn:hover { filter: brightness(0.97); }
+  .btn:active { transform: scale(.98); }
+  .btn-accent { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .btn-ghost { background: transparent; }
+  .btn-danger { color: var(--danger); }
+  .btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--accent2); outline-offset: 1px;
   }
 
-  .msg{
-    display:none;
+  /* scan bar */
+  .scanbar {
+    display: flex; gap: 8px; align-items: center; background: var(--panel); border: 1px solid var(--border);
+    border-radius: 11px; padding: 6px 6px 6px 12px; box-shadow: var(--shadow);
   }
-}
+  .scanbar input {
+    flex: 1; border: 0; background: transparent; font-family: 'Roboto Mono', monospace; font-size: 15px;
+    color: var(--text); padding: 8px 0; min-width: 0;
+  }
+  .scanbar input:focus { outline: none; }
+  .scanbar .hint { color: var(--muted); font-size: 12px; }
+
+  section.card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); margin-top: 16px; overflow: hidden;
+  }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between; padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-head h2 { font-size: 15px; margin: 0; font-weight: 700; }
+  .count-chip { font-size: 12px; color: var(--muted); background: var(--panel-2); border-radius: 999px; padding: 2px 10px; }
+
+  /* list */
+  .row {
+    display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; align-items: center;
+    padding: 13px 16px; border-bottom: 1px solid var(--border); cursor: pointer;
+  }
+  .row:last-child { border-bottom: none; }
+  .row:hover { background: var(--panel-2); }
+  .row-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .row-title { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .row-serial { font-size: 13px; font-weight: 600; }
+  .row-plate { font-family: 'Roboto Mono', monospace; font-size: 13px; color: var(--muted); }
+  .row-sub { font-size: 12.5px; color: var(--muted); }
+  .badge {
+    font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; white-space: nowrap;
+  }
+  .badge-pending { background: var(--warn-bg); color: var(--warn); }
+  .badge-entered { background: var(--info-bg); color: var(--info); }
+  .badge-called  { background: var(--info-bg); color: var(--accent2); }
+  .badge-exited  { background: var(--success-bg); color: var(--success); }
+  .badge-done    { background: var(--success-bg); color: var(--success); }
+  .badge-cancel  { background: var(--danger-bg); color: var(--danger); }
+
+  .empty { padding: 40px 16px; text-align: center; color: var(--muted); font-size: 14px; }
+  .empty b { display: block; color: var(--text); font-size: 15px; margin-bottom: 4px; }
+
+  .banner {
+    display: flex; gap: 8px; align-items: center; font-size: 13px; padding: 10px 14px; border-radius: 10px;
+    background: var(--warn-bg); color: var(--warn); margin-top: 14px; border: 1px solid transparent;
+  }
+
+  /* overlay + modal */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(10,14,20,.5); backdrop-filter: blur(2px);
+    display: flex; align-items: flex-end; justify-content: center; z-index: 50; padding: 0;
+  }
+  @media (min-width: 640px) { .overlay { align-items: center; padding: 20px; } }
+  .modal {
+    background: var(--panel); width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto;
+    border-radius: 16px 16px 0 0; box-shadow: var(--shadow);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (min-width: 640px) { .modal { border-radius: 16px; } }
+  .modal-head {
+    display: flex; align-items: center; justify-content: space-between; padding: 16px 18px;
+    border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--panel); z-index: 2;
+  }
+  .modal-head h3 { margin: 0; font-size: 16px; }
+  .modal-body { padding: 18px; }
+  .x-btn {
+    width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2);
+    color: var(--muted); cursor: pointer; font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center;
+  }
+
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12.5px; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+  .field input, .field select, .field textarea {
+    width: 100%; font-family: inherit; font-size: 14px; padding: 10px 12px; border-radius: 9px;
+    border: 1px solid var(--border); background: var(--panel-2); color: var(--text);
+  }
+  .field .mono-input { font-family: 'Roboto Mono', monospace; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+  @media (max-width: 480px) { .grid-2 { grid-template-columns: 1fr; } }
+  .fieldset-title { font-size: 12px; font-weight: 700; color: var(--muted); margin: 18px 0 8px; text-transform: none; }
+  .form-actions { display: flex; gap: 8px; margin-top: 6px; }
+  .form-actions .btn { flex: 1; justify-content: center; }
+
+  /* detail / lookup view — ordered exactly like the reference query page */
+  .barcode-box { background: #fff; border-radius: 10px; padding: 14px 10px 10px; text-align: center; }
+  .barcode-box svg { max-width: 100%; height: auto; }
+  .serial-caption { font-family: 'Roboto Mono', monospace; font-size: 13px; color: #333; margin-top: -6px; }
+  .kv-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .kv-table tr { border-bottom: 1px solid var(--border); }
+  .kv-table tr:last-child { border-bottom: none; }
+  .kv-table td { padding: 10px 4px; font-size: 13.5px; vertical-align: top; }
+  .kv-table td:first-child { color: var(--muted); width: 46%; }
+  .kv-table td:last-child { font-weight: 600; text-align: left; direction: ltr; }
+  [dir="rtl"] .kv-table td:last-child { text-align: left; }
+  .kv-table .status-val { font-weight: 700; }
+  .kv-table .status-pending { color: var(--warn); }
+  .kv-table .status-entered { color: var(--info); }
+  .kv-table .status-called  { color: var(--accent2); }
+  .kv-table .status-exited  { color: var(--success); }
+  .kv-table .status-done    { color: var(--success); }
+  .kv-table .status-cancel  { color: var(--danger); }
+
+  /* public lookup page */
+  .lookup-wrap { max-width: 480px; margin: 32px auto; padding: 0 16px 60px; }
+  .lookup-card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+  .lookup-head { padding: 22px 18px 16px; text-align: center; border-bottom: 1px solid var(--border); }
+  .lookup-head .brand-mark { margin: 0 auto 10px; }
+  .lookup-head h1 { font-size: 16px; margin: 0 0 4px; }
+  .lookup-head .sub-link { font-size: 12.5px; color: var(--muted); direction: ltr; display: inline-block; }
+  .lookup-body { padding: 18px; }
+  .not-found { text-align: center; padding: 50px 20px; color: var(--muted); }
+
+  /* misc */
+  .search-empty { font-size: 12.5px; color: var(--muted); text-align: center; padding: 6px 0 2px; }
+  a.link { color: var(--accent2); text-decoration: none; font-weight: 600; }
+
+  @media print {
+    body * { visibility: hidden; }
+    #printArea, #printArea * { visibility: visible; }
+    #printArea { position: fixed; inset: 0; padding: 24px; background: #fff !important; color: #000 !important; }
+    .barcode-box { border: none; }
+  }
 </style>
 </head>
-
 <body>
 
-<main class="page">
-
-  <div id="loading" class="msg">
-    در حال دریافت اطلاعات…
-  </div>
-
-  <div id="error" class="msg hidden"></div>
-
-  <section id="content" class="box hidden"></section>
-
-</main>
+<div id="app"></div>
+<div id="printArea" style="display:none"></div>
 
 <script>
+(function(){
+  "use strict";
 
-let sb;
+  /* ====== اطلاعات پروژه فایربیس خودتون رو اینجا جایگزین کنید ======
+     این ۶ مقدار رو از Firebase Console > Project settings کپی کنید. */
+  var FIREBASE_CONFIG = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  /* ================================================================ */
 
-function esc(v){
-  return String(v ?? '').replace(/[&<>"']/g,s=>({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#039;'
-  }[s]));
-}
+  var STATUS = {
+    pending: { label: "در انتظار", cls: "badge-pending", vcls: "status-pending" },
+    entered: { label: "وارد تیرپارک شده", cls: "badge-entered", vcls: "status-entered" },
+    called:  { label: "فراخوانده شده", cls: "badge-called", vcls: "status-called" },
+    exited:  { label: "خارج شده از تیرپارک", cls: "badge-exited", vcls: "status-exited" },
+    done:    { label: "تکمیل شده", cls: "badge-done", vcls: "status-done" },
+    cancel:  { label: "لغو شده", cls: "badge-cancel", vcls: "status-cancel" }
+  };
 
-function showError(t){
-  document.getElementById('loading').classList.add('hidden');
-  const error=document.getElementById('error');
-  error.textContent=t;
-  error.classList.remove('hidden');
-}
+  /* Exact field order, matching the reference query page:
+     سریال نوبت، نام مرز، نوع صف، شماره پلاک، نوع نوبت، زمان دریافت نوبت،
+     وضعیت، تیرپارک، شماره سرویس، زمان ورود به تیرپارک، زمان فراخوان،
+     زمان خروج از تیرپارک، زمان مجاز ورود به گمرک */
+  var FIELD_ORDER = [
+    ["serial",          "سریال نوبت",            "mono"],
+    ["borderName",      "نام مرز"],
+    ["queueType",       "نوع صف"],
+    ["plate",           "شماره پلاک",             "mono"],
+    ["appointmentType", "نوع نوبت"],
+    ["turnAt",          "زمان دریافت نوبت",       "mono"],
+    ["status",          "وضعیت"],
+    ["parkName",        "تیرپارک"],
+    ["serviceNumber",   "شماره سرویس",            "mono"],
+    ["parkInAt",        "زمان ورود به تیرپارک",   "mono"],
+    ["calledAt",        "زمان فراخوان",           "mono"],
+    ["parkOutAt",       "زمان خروج از تیرپارک",   "mono"],
+    ["customsAt",       "زمان مجاز ورود به گمرک", "mono"]
+  ];
+  var TIME_FIELDS = [
+    ["turnAt",     "زمان دریافت نوبت"],
+    ["parkInAt",   "زمان ورود به تیرپارک"],
+    ["calledAt",   "زمان فراخوان"],
+    ["parkOutAt",  "زمان خروج از تیرپارک"],
+    ["customsAt",  "زمان مجاز ورود به گمرک"]
+  ];
 
-function f(v){
-  return v===null || v===undefined || v==='' ? '' : esc(v);
-}
+  var root = document.getElementById("app");
+  var db = null, dbReady = false, mode = "local"; // mode: "firebase" | "claudedb" | "local"
+  var appointments = [];    // live list
+  var params = new URLSearchParams(location.search);
+  var isLookupMode = params.has("serial") || params.has("id");
 
-function date(v){
-
-  if(!v) return '';
-
-  try{
-
-    return new Date(v).toLocaleString('fa-IR',{
-      year:'numeric',
-      month:'2-digit',
-      day:'2-digit',
-      hour:'2-digit',
-      minute:'2-digit'
+  function uid(){ return Math.random().toString(36).slice(2,8) + Date.now().toString(36).slice(-4); }
+  function escapeHtml(s){
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
     });
-
-  }catch(e){
-
-    return esc(v);
-
+  }
+  function genSerial(){
+    var n = "";
+    for (var i=0;i<9;i++) n += Math.floor(Math.random()*10);
+    return "FN" + n;
+  }
+  function statusInfo(s){ return STATUS[s] || STATUS.pending; }
+  function fmtCreated(iso){
+    try { return new Date(iso).toLocaleString("fa-IR", { dateStyle: "medium", timeStyle: "short" }); }
+    catch(e){ return iso || ""; }
   }
 
-}
+  /* Build the ordered rows for the detail / lookup / print views */
+  function orderedRowsHtml(a){
+    return FIELD_ORDER.map(function(f){
+      var key = f[0], label = f[1], mono = f[2] === "mono";
+      var valHtml;
+      if (key === "status") {
+        var s = statusInfo(a.status);
+        valHtml = '<span class="status-val ' + s.vcls + '">' + s.label + '</span>';
+      } else {
+        var v = a[key];
+        valHtml = escapeHtml(v || "—");
+      }
+      return '<tr><td>' + label + '</td><td' + (mono ? ' class="mono"' : '') + '>' + valHtml + '</td></tr>';
+    }).join("");
+  }
 
-async function run(){
+  /* ---------------- local fallback storage ---------------- */
+  var LOCAL_KEY = "border_appointments_v1";
+  function localLoad(){
+    try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "[]"); } catch(e){ return []; }
+  }
+  function localSave(list){
+    try { localStorage.setItem(LOCAL_KEY, JSON.stringify(list)); } catch(e){}
+  }
 
-  try{
-
-    if(
-      !window.supabase ||
-      !window.SUPABASE_URL ||
-      !window.SUPABASE_ANON_KEY
-    ){
-
-      showError('اتصال سامانه برقرار نشد.');
-      return;
-
+  /* ---------------- data layer ---------------- */
+  function sortAppointments(){
+    appointments.sort(function(a,b){ return (b.createdAt||"").localeCompare(a.createdAt||""); });
+  }
+  function initData(cb){
+    var hasFirebaseConfig = FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey.indexOf("YOUR_") !== 0;
+    if (hasFirebaseConfig && window.firebase) {
+      try {
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        db = firebase.firestore();
+        mode = "firebase"; dbReady = true;
+        db.collection("appointments").onSnapshot(function(snap){
+          appointments = snap.docs.map(function(d){ return d.data(); });
+          sortAppointments();
+          cb();
+        }, function(err){ console.error(err); fallbackLocal(cb); });
+        return;
+      } catch(e){ console.error(e); fallbackLocal(cb); return; }
     }
+    if (window.claude && window.claude.use) {
+      window.claude.use("db").then(function(handle){
+        if (!handle) { fallbackLocal(cb); return; }
+        db = handle; mode = "claudedb"; dbReady = true;
+        try {
+          db.collection("appointments").onSnapshot(function(docs){
+            appointments = (docs || []).map(function(d){ return d.data ? d.data() : d; });
+            sortAppointments();
+            cb();
+          });
+        } catch(e){ fallbackLocal(cb); }
+      }).catch(function(){ fallbackLocal(cb); });
+    } else {
+      fallbackLocal(cb);
+    }
+  }
+  function fallbackLocal(cb){
+    mode = "local";
+    appointments = localLoad();
+    sortAppointments();
+    cb();
+  }
+  function saveAppointment(data, isNew){
+    if (mode === "local") {
+      var list = localLoad();
+      var idx = list.findIndex(function(a){ return a.serial === data.serial; });
+      if (idx >= 0) list[idx] = data; else list.unshift(data);
+      localSave(list);
+      appointments = list;
+      render();
+      return Promise.resolve();
+    }
+    if (mode === "firebase") return db.collection("appointments").doc(data.serial).set(data);
+    return db.doc("appointments/" + data.serial).set(data); // claudedb
+  }
+  function deleteAppointment(serial){
+    if (mode === "local") {
+      var list = localLoad().filter(function(a){ return a.serial !== serial; });
+      localSave(list);
+      appointments = list;
+      render();
+      return;
+    }
+    if (mode === "firebase") { db.collection("appointments").doc(serial).delete(); return; }
+    db.doc("appointments/" + serial).delete(); // claudedb
+  }
+  function findBySerial(serial, cb){
+    serial = (serial || "").trim();
+    if (!serial) return cb(null);
+    if (mode === "local") {
+      var found = localLoad().find(function(a){ return a.serial === serial; });
+      return cb(found || null);
+    }
+    if (!dbReady) return cb(null);
+    var hit = appointments.find(function(a){ return a.serial === serial; });
+    if (hit) return cb(hit);
+    if (mode === "firebase") {
+      db.collection("appointments").doc(serial).get().then(function(d){
+        cb(d && d.exists ? d.data() : null);
+      }).catch(function(){ cb(null); });
+      return;
+    }
+    db.doc("appointments/" + serial).get().then(function(d){
+      cb(d && d.exists ? d.data() : null);
+    }).catch(function(){ cb(null); }); // claudedb
+  }
 
-    sb=window.supabase.createClient(
-      window.SUPABASE_URL,
-      window.SUPABASE_ANON_KEY
-    );
+  /* ---------------- barcode ---------------- */
+  function renderBarcode(svgEl, value){
+    try {
+      JsBarcode(svgEl, value, {
+        format: "CODE128", displayValue: false, margin: 6, height: 62, width: 2.1, background: "#ffffff", lineColor: "#111111"
+      });
+    } catch(e){}
+  }
 
-    /*
-      صفحه عمومی فقط با QR اختصاصی باز می‌شود.
-     
+  /* ---------------- download barcode as PNG ---------------- */
+  function svgToPngBlob(svgEl, cb){
+    try {
+      var svgClone = svgEl.cloneNode(true);
+      var w = parseInt(svgEl.getAttribute("width"), 10) || 300;
+      var h = parseInt(svgEl.getAttribute("height"), 10) || 100;
+      var scale = 3;
+      svgClone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+      var svgStr = new XMLSerializer().serializeToString(svgClone);
+      var svgBlob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
+      var url = URL.createObjectURL(svgBlob);
+      var img = new Image();
+      img.onload = function(){
+        var canvas = document.createElement("canvas");
+        canvas.width = w * scale; canvas.height = h * scale;
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(url);
+        canvas.toBlob(function(blob){ cb(blob); }, "image/png");
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); cb(null); };
+      img.src = url;
+    } catch(e){ cb(null); }
+  }
+  function anchorDownload(blob, filename){
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement("a");
+    link.href = url; link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+  }
+  function downloadBarcode(svgEl, serial){
+    svgToPngBlob(svgEl, function(blob){
+      if (!blob) { alert("دانلود بارکد با خطا مواجه شد."); return; }
+      var filename = serial + ".png";
+      if (window.claude && window.claude.use) {
+        window.claude.use("downloads").then(function(downloads){
+          if (!downloads) { anchorDownload(blob, filename); return; }
+          downloads.save({ filename: filename, data: blob }).catch(function(err){
+            if (err && (err.code === "unavailable" || err.code === "not_granted")) anchorDownload(blob, filename);
+          });
+        }).catch(function(){ anchorDownload(blob, filename); });
+      } else {
+        anchorDownload(blob, filename);
+      }
+    });
+  }
+
+  /* ---------------- print ---------------- */
+  function printAppointment(a){
+    var area = document.getElementById("printArea");
+    area.innerHTML =
+      '<div style="text-align:center;font-family:Vazirmatn,sans-serif;direction:rtl;">' +
+        '<div style="font-size:13px;color:#555;margin-bottom:10px;">برگه نوبت</div>' +
+        '<div class="barcode-box" style="display:inline-block;"><svg id="printSvg"></svg></div>' +
+        '<div class="serial-caption" style="margin-top:6px;">' + escapeHtml(a.serial) + '</div>' +
+        '<table class="kv-table" style="margin:18px auto 0;max-width:360px;text-align:right;">' +
+          orderedRowsHtml(a) +
+        '</table>' +
+      '</div>';
+    area.style.display = "block";
+    renderBarcode(document.getElementById("printSvg"), a.serial);
+    setTimeout(function(){
+      window.print();
+      area.style.display = "none";
+    }, 80);
+  }
+
+  /* ================= PUBLIC LOOKUP VIEW (matches reference query page) ================= */
+  function renderLookup(){
+    var serial = params.get("serial") || params.get("id") || "";
+    root.innerHTML =
+      '<div class="lookup-wrap">' +
+        '<div class="lookup-card">' +
+          '<div class="lookup-head">' +
+            '<div class="brand-mark">🛃</div>' +
+            '<h1>استعلام نوبت</h1>' +
+          '</div>' +
+          '<div class="lookup-body" id="lookupBody">' +
+            '<div class="field"><label>سریال نوبت</label>' +
+              '<input class="mono-input" id="lookupInput" value="' + escapeHtml(serial) + '" placeholder="سریال را وارد یا اسکن کنید">' +
+            '</div>' +
+            '<button class="btn btn-accent" id="lookupBtn" style="width:100%;justify-content:center;">استعلام</button>' +
+            '<div id="lookupResult"></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    document.getElementById("lookupBtn").addEventListener("click", doLookup);
+    document.getElementById("lookupInput").addEventListener("keydown", function(e){
+      if (e.key === "Enter") doLookup();
+    });
+    if (serial) doLookup();
+  }
+
+  function doLookup(){
+    var val = document.getElementById("lookupInput").value.trim();
+    var box = document.getElementById("lookupResult");
+    box.innerHTML = '<div class="search-empty">در حال جستجو…</div>';
+    findBySerial(val, function(a){
+      if (!a) {
+        box.innerHTML = '<div class="not-found"><b style="display:block;color:var(--text);margin-bottom:4px;">نوبتی یافت نشد</b>سریال وارد شده را بررسی کنید.</div>';
+        return;
+      }
+      box.innerHTML =
+        '<div style="margin-top:16px;">' +
+          '<div class="barcode-box"><svg id="lookupSvg"></svg></div>' +
+          '<div class="serial-caption" style="text-align:center;">' + escapeHtml(a.serial) + '</div>' +
+          '<div class="form-actions" style="margin:10px 0 4px;"><button class="btn btn-accent" id="lookupDownload" style="width:100%;justify-content:center;">⬇ دانلود بارکد</button></div>' +
+          '<table class="kv-table">' + orderedRowsHtml(a) + '</table>' +
+        '</div>';
+      renderBarcode(document.getElementById("lookupSvg"), a.serial);
+      document.getElementById("lookupDownload").addEventListener("click", function(){
+        downloadBarcode(document.getElementById("lookupSvg"), a.serial);
+      });
+    });
+  }
+
+  /* ================= INTERNAL DASHBOARD ================= */
+  var modalState = null; // { mode: 'form'|'detail', data }
+
+  function render(){
+    if (isLookupMode) { renderLookup(); return; }
+
+    var listHtml = appointments.length ? appointments.map(rowHtml).join("") :
+      '<div class="empty"><b>هنوز نوبتی ثبت نشده</b>برای شروع یک نوبت جدید اضافه کنید.</div>';
+
+    root.innerHTML =
+      '<div class="topbar"><div class="topbar-inner">' +
+        '<div class="brand"><div class="brand-mark">🛃</div>' +
+          '<div class="brand-text"><b>سامانه نوبت‌دهی مرزی</b><span>ثبت، بارکد و استعلام نوبت‌ها</span></div>' +
+        '</div>' +
+        '<button class="btn btn-accent" id="addBtn">+ نوبت جدید</button>' +
+      '</div></div>' +
+      '<div class="wrap">' +
+        (mode === "local" ? '<div class="banner">⚠ اتصال به دیتابیس مشترک برقرار نیست — اطلاعات فقط روی همین مرورگر ذخیره می‌شود. برای رفع این مورد، اطلاعات Firebase خودتان را در ابتدای کد جایگزین کنید.</div>' : '') +
+        '<div class="scanbar" style="margin-top:16px;">' +
+          '<span style="color:var(--muted);">🔎</span>' +
+          '<input id="scanInput" class="mono-input" placeholder="اسکن بارکد یا وارد کردن سریال برای مشاهده وضعیت…" autocomplete="off">' +
+          '<span class="hint">Enter</span>' +
+        '</div>' +
+        '<section class="card">' +
+          '<div class="card-head"><h2>فهرست نوبت‌ها</h2><span class="count-chip">' + appointments.length + ' مورد</span></div>' +
+          '<div id="listBody">' + listHtml + '</div>' +
+        '</section>' +
+      '</div>';
+
+    document.getElementById("addBtn").addEventListener("click", function(){ openForm(null); });
+    var scanInput = document.getElementById("scanInput");
+    scanInput.addEventListener("keydown", function(e){
+      if (e.key === "Enter") {
+        var v = scanInput.value.trim();
+        if (!v) return;
+        findBySerial(v, function(a){
+          if (a) openDetail(a);
+          else { scanInput.style.outline = "2px solid var(--danger)"; setTimeout(function(){ scanInput.style.outline = ""; }, 700); }
+        });
+        scanInput.value = "";
+      }
+    });
+    appointments.forEach(function(a){
+      var el = document.getElementById("row_" + a.serial);
+      if (el) el.addEventListener("click", function(){ openDetail(a); });
+    });
+
+    if (modalState) renderModal(); else closeModalDom();
+  }
+
+  function rowHtml(a){
+    var s = statusInfo(a.status);
+    return '<div class="row" id="row_' + a.serial + '">' +
+        '<div class="row-main">' +
+          '<div class="row-title"><span class="row-serial mono">' + escapeHtml(a.serial) + '</span><span class="row-plate">' + escapeHtml(a.plate || "—") + '</span></div>' +
+          '<div class="row-sub">' + escapeHtml(a.borderName || "—") + ' · ' + escapeHtml(a.queueType || "—") + '</div>' +
+        '</div>' +
+        '<span class="badge ' + s.cls + '">' + s.label + '</span>' +
+      '</div>';
+  }
+
+  function openForm(existing){
+    modalState = { mode: "form", data: existing ? Object.assign({}, existing) : {
+      serial: genSerial(), plate: "", borderName: "", queueType: "", appointmentType: "حضوری",
+      status: "pending", parkName: "", serviceNumber: "", createdAt: new Date().toISOString()
+    }};
+    render();
+  }
+  function openDetail(a){
+    modalState = { mode: "detail", data: a };
+    render();
+  }
+  function closeModal(){ modalState = null; render(); }
+  function closeModalDom(){
+    var existing = document.getElementById("modalOverlay");
+    if (existing) existing.remove();
+  }
+
+  function renderModal(){
+    closeModalDom();
+    var overlay = document.createElement("div");
+    overlay.className = "overlay";
+    overlay.id = "modalOverlay";
+    overlay.addEventListener("mousedown", function(e){ if (e.target === overlay) closeModal(); });
+
+    if (modalState.mode === "form") {
+      overlay.innerHTML = formModalHtml(modalState.data);
+    } else {
+      overlay.innerHTML = detailModalHtml(modalState.data);
+    }
+    document.body.appendChild(overlay);
+
+    if (modalState.mode === "form") wireForm(modalState.data);
+    else wireDetail(modalState.data);
+
+    document.getElementById("modalClose").addEventListener("click", closeModal);
+  }
+
+  function formModalHtml(a){
+    var isNew = !appointments.some(function(x){ return x.serial === a.serial; });
+    return '<div class="modal">' +
+      '<div class="modal-head"><h3>' + (isNew ? "ثبت نوبت جدید" : "ویرایش نوبت") + '</h3><button class="x-btn" id="modalClose">✕</button></div>' +
+      '<div class="modal-body">' +
+        '<div class="field"><label>سریال نوبت</label><input class="mono-input" id="f_serial" value="' + escapeHtml(a.serial) + '" ' + (isNew ? "" : "disabled") + '></div>' +
+        '<div class="field"><label>نام مرز</label><input id="f_border" value="' + escapeHtml(a.borderName || "") + '"></div>' +
+        '<div class="field"><label>نوع صف</label><input id="f_queue" value="' + escapeHtml(a.queueType || "") + '" placeholder="صادرات فسادپذیر"></div>' +
+        '<div class="grid-2">' +
+          '<div class="field"><label>شماره پلاک</label><input class="mono-input" id="f_plate" value="' + escapeHtml(a.plate || "") + '" placeholder="۲۵-۴۷۶ع۹۸"></div>' +
+          '<div class="field"><label>نوع نوبت</label>' +
+            '<select id="f_type"><option ' + (a.appointmentType==="حضوری"?"selected":"") + '>حضوری</option><option ' + (a.appointmentType==="غیرحضوری"?"selected":"") + '>غیرحضوری</option></select></div>' +
+        '</div>' +
+        '<div class="field"><label>زمان دریافت نوبت</label><input class="mono-input" id="f_turnAt" value="' + escapeHtml(a.turnAt || "") + '" placeholder="1405-06-06 10:43"></div>' +
+        '<div class="field"><label>وضعیت</label><select id="f_status">' +
+          Object.keys(STATUS).map(function(k){ return '<option value="' + k + '" ' + (a.status===k?"selected":"") + '>' + STATUS[k].label + '</option>'; }).join("") +
+        '</select></div>' +
+        '<div class="grid-2">' +
+          '<div class="field"><label>تیرپارک</label><input id="f_park" value="' + escapeHtml(a.parkName || "") + '"></div>' +
+          '<div class="field"><label>شماره سرویس</label><input class="mono-input" id="f_service" value="' + escapeHtml(a.serviceNumber || "") + '"></div>' +
+        '</div>' +
+        '<div class="fieldset-title">زمان‌های تیرپارک و گمرک</div>' +
+        '<div class="field"><label>زمان ورود به تیرپارک</label><input class="mono-input" id="f_parkInAt" value="' + escapeHtml(a.parkInAt || "") + '" placeholder="1405-06-06 10:43"></div>' +
+        '<div class="field"><label>زمان فراخوان</label><input class="mono-input" id="f_calledAt" value="' + escapeHtml(a.calledAt || "") + '" placeholder="1405-06-11 20:13"></div>' +
+        '<div class="field"><label>زمان خروج از تیرپارک</label><input class="mono-input" id="f_parkOutAt" value="' + escapeHtml(a.parkOutAt || "") + '" placeholder="1405-06-12 11:30"></div>' +
+        '<div class="field"><label>زمان مجاز ورود به گمرک</label><input class="mono-input" id="f_customsAt" value="' + escapeHtml(a.customsAt || "") + '" placeholder="1405-06-14 11:31"></div>' +
+        '<div class="form-actions">' +
+          (isNew ? "" : '<button class="btn btn-danger" id="f_delete">حذف نوبت</button>') +
+          '<button class="btn btn-accent" id="f_save">' + (isNew ? "ثبت نوبت" : "ذخیره تغییرات") + '</button>' +
+        '</div>' +
+      '</div></div>';
+  }
+
+  function wireForm(a){
+    var isNew = !appointments.some(function(x){ return x.serial === a.serial; });
+    document.getElementById("f_save").addEventListener("click", function(){
+      var serial = document.getElementById("f_serial").value.trim();
+      if (!serial) { alert("سریال نمی‌تواند خالی باشد."); return; }
+      if (isNew && appointments.some(function(x){ return x.serial === serial; })) {
+        alert("این سریال قبلاً ثبت شده است."); return;
+      }
+      var data = {
+        serial: serial,
+        borderName: document.getElementById("f_border").value.trim(),
+        queueType: document.getElementById("f_queue").value.trim(),
+        plate: document.getElementById("f_plate").value.trim(),
+        appointmentType: document.getElementById("f_type").value,
+        turnAt: document.getElementById("f_turnAt").value.trim(),
+        status: document.getElementById("f_status").value,
+        parkName: document.getElementById("f_park").value.trim(),
+        serviceNumber: document.getElementById("f_service").value.trim(),
+        parkInAt: document.getElementById("f_parkInAt").value.trim(),
+        calledAt: document.getElementById("f_calledAt").value.trim(),
+        parkOutAt: document.getElementById("f_parkOutAt").value.trim(),
+        customsAt: document.getElementById("f_customsAt").value.trim(),
+        createdAt: a.createdAt || new Date().toISOString()
+      };
+      saveAppointment(data, isNew).then(function(){ closeModal(); });
+    });
+    if (!isNew) {
+      document.getElementById("f_delete").addEventListener("click", function(){
+        if (confirm("این نوبت حذف شود؟")) { deleteAppointment(a.serial); closeModal(); }
+      });
+    }
+  }
+
+  function detailModalHtml(a){
+    return '<div class="modal">' +
+      '<div class="modal-head"><h3>جزئیات نوبت</h3><button class="x-btn" id="modalClose">✕</button></div>' +
+      '<div class="modal-body">' +
+        '<div class="barcode-box"><svg id="detailSvg"></svg></div>' +
+        '<div class="serial-caption" style="text-align:center;">' + escapeHtml(a.serial) + '</div>' +
+        '<table class="kv-table">' + orderedRowsHtml(a) + '</table>' +
+        '<div class="form-actions">' +
+          '<button class="btn" id="d_download">⬇ دانلود بارکد</button>' +
+          '<button class="btn" id="d_print">🖨 چاپ بارکد</button>' +
+          '<button class="btn" id="d_edit">✎ ویرایش</button>' +
+        '</div>' +
+      '</div></div>';
+  }
+  function wireDetail(a){
+    renderBarcode(document.getElementById("detailSvg"), a.serial);
+    document.getElementById("d_download").addEventListener("click", function(){
+      downloadBarcode(document.getElementById("detailSvg"), a.serial);
+    });
+    document.getElementById("d_print").addEventListener("click", function(){ printAppointment(a); });
+    document.getElementById("d_edit").addEventListener("click", function(){ openForm(a); });
+  }
+
+  /* boot */
+  initData(render);
+})();
+</script>
+</body>
+</html>
